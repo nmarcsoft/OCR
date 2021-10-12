@@ -1,7 +1,6 @@
-#ifndef FIBO_H
-#define FIBO_H
+#ifndef NEURONE_H
+#define NEURONE_H
 
-
-#Le nom des fonctions utilisés
+int initialize();
 
 #endif
