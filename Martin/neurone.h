@@ -1,6 +1,6 @@
 #ifndef NEURONE_H
 #define NEURONE_H
 
-int initialize();
+double initialize();
 
 #endif
