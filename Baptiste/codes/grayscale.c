@@ -66,6 +66,48 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
+int rotate(SDL_Surface *img)
+{
+	for (int i = 0; i < width; i++)
+	{
+		for (int j = 0; j < height; j++)
+		{
+		Uint32 pixel = get_pixel(image_surface, i, j);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+		if (r + g + b < 10)
+		{
+			// We have a black pixel
+			int test = 1;
+			while (i < width && test)
+			{
+			i++;
+			Uint32 pixel = get_pixel(image_surface, i, j);
+			Uint8 r, g, b;
+			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+			if ((r + g + b) > 20)
+			{
+				test = 0;
+			}
+			else
+			{
+				cpt += 1;
+			}
+			}
+			if (cpt > 200)
+			{
+			cptHeight += 1;
+			j += 20;
+			}
+		}
+		}
+	}
+	if(cptHeight > 0)
+		return 0;
+	else
+		return 1;
+
+}
 
 int main()
 {
@@ -79,6 +121,7 @@ int main()
     int width = image_surface->w;
     int height = image_surface->h;
     Uint8 med = 0;
+    //average image color calcul
     for (int i = 0; i < width; i++)
     {
       for (int j = 0; j < height; j++)
@@ -89,7 +132,7 @@ int main()
 	med = med + (r + g + b)/3;
       }
     }
-    if(med > 140)
+    if(med > 140) //average image color >140
     {
     for (int i = 0; i < width; i++)
     {
@@ -112,7 +155,7 @@ int main()
       }
     }
     }
-	else 
+	else //average color<140
     {
     for (int i = 0; i < width; i++)
     {
@@ -135,7 +178,9 @@ int main()
       }
     }
     }
-
+	//Rotate function
+	
+//https://github.com/mauryquijada/image-manipulation-in-c/blob/master/rotate.c
 	update_surface(screen_surface, image_surface);
 
     wait_for_keypressed();
