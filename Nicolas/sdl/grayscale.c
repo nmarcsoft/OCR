@@ -71,12 +71,13 @@ int main()
 {
 
     SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("index.jpg");
-    screen_surface = display_image(image_surface);
-
+    image_surface = load_image("Horizontal.jpg");
+    // CPT : Count number of white pixels, if > 200 -> black line detected
+    int cpt = 0;
+    // cptline : Count lines
+    int cptline = 0;
     int width = image_surface->w;
     int height = image_surface->h;
     for (int i = 0; i < width; i++)
@@ -86,22 +87,34 @@ int main()
 		Uint32 pixel = get_pixel(image_surface, i, j);
 		Uint8 r, g, b;
 		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-		r = .3*r;
-		g = .59*g;
-		b = .11 * b;
-		Uint8 t = r + g + b;
-		Uint32 pixel2 = SDL_MapRGB(image_surface->format, t, t, t);
-		put_pixel(image_surface, i, j, pixel2);
-
+		if (r + g + b < 10)
+		{
+			// We have a black pixel
+			int test = 1;
+			while (i < width && test)
+			{
+			i++;
+			Uint32 pixel = get_pixel(image_surface, i, j);
+			Uint8 r, g, b;
+			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+			if ((r + g + b) > 20)
+			{
+				test = 0;
+			}
+			else
+			{
+				cpt += 1;
+			}
+			}
+			if (cpt > 200)
+			{
+				cptline += 1;
+				j += 20;
+			}
+		}
 	}
+	}
+    printf("Ligne : %d", cptline);
+    return 0;
     }
 
-	update_surface(screen_surface, image_surface);
-
-    wait_for_keypressed();
-	SDL_FreeSurface(image_surface);
-    SDL_FreeSurface(screen_surface);
-void SDL_FreeSurface(SDL_Surface *surface);
-
-    return 0;
-}
