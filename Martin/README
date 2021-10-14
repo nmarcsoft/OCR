@@ -1,2 +1,7 @@
+TODO :
+	Comprendre pourquoi on met x neuron dans le modele
+
+
+==========
 gcc -Wall -Wextra -Werror -lm -std=c99 -O1 -o main *.c
 https://towardsdatascience.com/implementing-the-xor-gate-using-backpropagation-in-neural-networks-c1f255b4f20d
