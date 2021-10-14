@@ -2,6 +2,9 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "pixel_operations.h"
+#include <SDL/SDL_rotozoom.h>
+
+#define TEMPS       30 
 
 void init_sdl()
 {
@@ -66,6 +69,7 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
+/*
 int rotate(SDL_Surface *img)
 {
 	for (int i = 0; i < width; i++)
@@ -107,7 +111,7 @@ int rotate(SDL_Surface *img)
 	else
 		return 1;
 
-}
+}*/
 
 int main()
 {
@@ -178,6 +182,57 @@ int main()
       }
     }
     }
+
+    SDL_Surface *rotation = NULL;
+    SDL_Rect rect;
+    SDL_Event event;
+    double angle = 0;
+ 
+    int continuer = 1;
+    int tempsPrecedent = 0, tempsActuel = 0;
+ 
+    SDL_Init(SDL_INIT_VIDEO);
+ 
+    screen_surface = SDL_SetVideoMode(500, 500, 32, SDL_HWSURFACE);
+    SDL_WM_SetCaption("Faire des rotations avec SDL_gfx", NULL);
+ 
+ 
+    while(continuer)
+    {
+        SDL_PollEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                continuer = 0;
+                break;
+        }
+ 
+        tempsActuel = SDL_GetTicks();
+        if (tempsActuel - tempsPrecedent > TEMPS)
+        {
+            angle += 2; //On augmente l'angle pour que l'image tourne sur elle-même.
+ 
+            tempsPrecedent = tempsActuel;
+        }
+        else
+        {
+            SDL_Delay(TEMPS - (tempsActuel - tempsPrecedent));
+        }
+ 
+        SDL_FillRect(screen_surface, NULL, SDL_MapRGB(screen_surface->format, 255, 255, 255));
+ 
+        rotation = rotozoomSurface(image_surface, angle, 1.0, 1); //On transforme la surface image.
+ 
+        //On positionne l'image en fonction de sa taille.
+        rect.x =  200 - rotation->w / 2;
+        rect.y =  200 - rotation->h / 2;
+ 
+        SDL_BlitSurface(rotation , NULL, screen_surface, &rect); //On affiche la rotation de la surface image.
+        SDL_FreeSurface(rotation); //On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
+ 
+        SDL_Flip(screen_surface);
+    }
+
 	//Rotate function
 	
 //https://github.com/mauryquijada/image-manipulation-in-c/blob/master/rotate.c

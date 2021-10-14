@@ -89,4 +89,15 @@ grayscale.o: grayscale.c /run/current-system/sw/include/stdc-predef.h \
  /run/current-system/sw/include/SDL/SDL_version.h \
  /run/current-system/sw/include/SDL/SDL_image.h \
  /run/current-system/sw/include/SDL/SDL.h pixel_operations.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL.h
+ /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL.h \
+ /run/current-system/sw/include/SDL/SDL_rotozoom.h \
+ /run/current-system/sw/include/math.h \
+ /run/current-system/sw/include/bits/math-vector.h \
+ /run/current-system/sw/include/bits/libm-simd-decl-stubs.h \
+ /run/current-system/sw/include/bits/flt-eval-method.h \
+ /run/current-system/sw/include/bits/fp-logb.h \
+ /run/current-system/sw/include/bits/fp-fast.h \
+ /run/current-system/sw/include/bits/mathcalls-helper-functions.h \
+ /run/current-system/sw/include/bits/mathcalls.h \
+ /run/current-system/sw/include/bits/mathcalls-narrow.h \
+ /run/current-system/sw/include/bits/iscanonical.h
