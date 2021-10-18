@@ -73,9 +73,7 @@ int main()
     SDL_Surface* image_surface;
     init_sdl();
 
-    image_surface = load_image("Case.jpg");
-    // CPT : Count number of white pixels, if > 200 -> black line detected
-    int cpt = 0;
+    image_surface = load_image("image_01.jpeg");
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
@@ -83,19 +81,22 @@ int main()
     int cptWidth = 0;
     int width = image_surface->w;
     int height = image_surface->h;
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < height; i++)
     {
-	for (int j = 0; j < height; j++)
+	for (int j = 0; j < width; j++)
 	{
 		Uint32 pixel = get_pixel(image_surface, i, j);
 		Uint8 r, g, b;
 		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 		// Check if the pixel is black
-		if (r + g + b < 10)
+		if (r + g + b < 50)
 		{
 			// We have a black pixel
+			// CPT : Count number of white pixels,
+			// if > 200 -> black line detected
+			int cpt = 0;
 			int test = 1;
-			while (i < width && test)
+			while (j < width && test)
 			{
 			i++;
 			Uint32 pixel = get_pixel(image_surface, i, j);
@@ -104,20 +105,35 @@ int main()
 			if ((r + g + b) > 20)
 			{
 				test = 0;
+				//printf("Last pixel spot cpt += ");
 			}
 			else
 			{
-				cpt += 1;
+				if (j == width)
+				{
+					if (cpt > 50)
+					{
+						cptWidth += 1;
+						cpt = 0;
+					}
+				}
+				else
+				{
+					cpt += 1;
+				}
 			}
 			}
-			if (cpt > 200)
+			printf("%d\n", cpt);
+			if (cpt > 50)
 			{
-				cptHeight += 1;
-				j += height/20;
+				cptWidth += 1;
+				i += height/20;
+				printf("Jump a line\n");
 			}
 		}
 	}
     }
+    /*
 for (int j = 0; j < height; j++)
     	{
 	for (int i = 0; i < width; i++)
@@ -151,7 +167,7 @@ for (int j = 0; j < height; j++)
 			}
 		}
 	}
-    }
+    }*/
     printf("Ligne droite - gauche : %d ligne haut - bas : %d", cptWidth, 
 		    cptHeight);
     return 0;
