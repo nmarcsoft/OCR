@@ -3,5 +3,6 @@ TODO :
 
 
 ==========
-gcc -Wall -Wextra -Werror -lm -std=c99 -O1 -o main *.c
+gcc -Wall -Wno-unused-variable -Wextra -Werror -lm -std=c99 -O1 -o main *.c
+https://www.geeksforgeeks.org/implementation-of-artificial-neural-network-for-xor-logic-gate-with-2-bit-binary-input/
 https://towardsdatascience.com/implementing-the-xor-gate-using-backpropagation-in-neural-networks-c1f255b4f20d
