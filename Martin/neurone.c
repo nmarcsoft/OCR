@@ -18,6 +18,8 @@ double grd(){//Generate random value
 
 
 double initialize(){
+	
+	//Input datasets
 	int output[4][2] = {
 		{0,0},
 		{0,1},
@@ -25,6 +27,9 @@ double initialize(){
 		{1,1}
 	};
 	int expected_output[4] = {0,1,1,0};
+
+	int epochs = 10000;
+	double lr = 0.1;
 	int inputLayersNeurons = 2;
 	int hiddenLayerNeurons = 2;
 	int outpuyLayerNeurons = 1;
@@ -41,25 +46,34 @@ double initialize(){
 		{w1,w2},
 		{w3,w4}
 	};
-
+	/*
 	double w5 = grd();
 	double w6 = grd();
 	double output_bias[1][2] = {
 		{w5,w6}
-	}
+	};
 	
 	double w7 = grd();
 	double w8 = grd();
-	double output_weights[2][1]{
+	double output_weights[2][1] = {
 		{w7},
 		{w8}
-	}
+	};
 	
 	double w9 = grd();
-	double output_bias[1][1]{
+	double output_bias[1][1] = {
 		{w9}
-	}
+	};
+	
+	double hidden_layer_activation[2][4];
+	hiden_layer[1][1] = hidden_weights[0][1];
+	printf("%d", hidden_layer[1][1];
 
+	//Training algorithm
+	for(int i = 0; i<epochs; i++){
+		hiden_layer[1][1] = hidden_weights[0][1];
+		printf("%d", hidden_layer[1][1];
+	}*/
 
 
 	    /*printf("[%d,%d]", output[i][0], output[i][1]);*/
