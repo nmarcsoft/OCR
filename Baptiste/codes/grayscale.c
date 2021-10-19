@@ -69,16 +69,20 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
-/*
-int rotate(SDL_Surface *img)
+
+/*int rotate(SDL_Surface *img)
 {
+	int cpt = 0;
+	int cptHeight = 0;
+	int width = img->w;
+        int height = img->h;
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)
 		{
-		Uint32 pixel = get_pixel(image_surface, i, j);
+		Uint32 pixel = get_pixel(img, i, j);
 		Uint8 r, g, b;
-		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+		SDL_GetRGB(pixel, img->format, &r, &g, &b);
 		if (r + g + b < 10)
 		{
 			// We have a black pixel
@@ -86,9 +90,9 @@ int rotate(SDL_Surface *img)
 			while (i < width && test)
 			{
 			i++;
-			Uint32 pixel = get_pixel(image_surface, i, j);
+			Uint32 pixel = get_pixel(img, i, j);
 			Uint8 r, g, b;
-			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+			SDL_GetRGB(pixel, img->format, &r, &g, &b);
 			if ((r + g + b) > 20)
 			{
 				test = 0;
@@ -107,9 +111,9 @@ int rotate(SDL_Surface *img)
 		}
 	}
 	if(cptHeight > 0)
-		return 0;
-	else
 		return 1;
+	else
+		return 0;
 
 }*/
 
@@ -124,20 +128,27 @@ int main()
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
-    Uint8 med = 0;
+    int max = 0;
+    int min = 255;
+    int mid = 0;
     //average image color calcul
-    for (int i = 0; i < width; i++)
+    for(int x = 0; x < width; x++)
     {
-      for (int j = 0; j < height; j++)
-      {
-	Uint32 pixel = get_pixel(image_surface, i, j);
-	Uint8 r, g, b;
-	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-	med = med + (r + g + b)/3;
-      }
+ 	for(int y = 0; y < height;y++)
+ 	{
+ 	      Uint32 pixel = get_pixel(image_surface, x, y);
+ 	      Uint8 r, g, b;
+ 	      SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
+ 	      mid = 0.3*r + 0.59*g + 0.11*b;
+ 	      if (mid <min)
+ 	      {min = mid;}
+ 	      if(mid > max)
+ 	      {max = mid;}
+ 	      Uint32 pixel2 = SDL_MapRGB(image_surface->format, mid, mid, mid);
+ 	      put_pixel(image_surface, x, y, pixel2);
+ 	}
     }
-    if(med > 140) //average image color >140
-    {
+    int threshold = (max + mid) / 2;
     for (int i = 0; i < width; i++)
     {
       for (int j = 0; j < height; j++)
@@ -146,7 +157,7 @@ int main()
 	Uint8 r, g, b;
 	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 	Uint8 t = (r + g + b)/3;
-	if(t>250)
+	if(t>threshold)
 	{
 	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 255, 255);
 	   put_pixel(image_surface, i, j, pixel2);
@@ -157,82 +168,45 @@ int main()
 	   put_pixel(image_surface, i, j, pixel2);
 	}
       }
-    }
-    }
-	else //average color<140
-    {
-    for (int i = 0; i < width; i++)
-    {
-      for (int j = 0; j < height; j++)
-      {
-	Uint32 pixel = get_pixel(image_surface, i, j);
-	Uint8 r, g, b;
-	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-	Uint8 t = (r + g + b)/3;
-	if(t>200)
-	{
-	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 255, 255);
-	   put_pixel(image_surface, i, j, pixel2);
-	}
-	else
-	{
-	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
-	   put_pixel(image_surface, i, j, pixel2);
-	}
-      }
-    }
     }
 
     SDL_Surface *rotation = NULL;
-    SDL_Rect rect;
     SDL_Event event;
+    SDL_Rect rect;
     double angle = 0;
- 
-    int continuer = 1;
-    int tempsPrecedent = 0, tempsActuel = 0;
- 
+
     SDL_Init(SDL_INIT_VIDEO);
- 
-    screen_surface = SDL_SetVideoMode(500, 500, 32, SDL_HWSURFACE);
+
     SDL_WM_SetCaption("Faire des rotations avec SDL_gfx", NULL);
- 
- 
-    while(continuer)
+
+    int continuer = 1;
+    while(continuer<20)
     {
         SDL_PollEvent(&event);
         switch(event.type)
         {
             case SDL_QUIT:
-                continuer = 0;
+		continuer = 0;
                 break;
         }
- 
-        tempsActuel = SDL_GetTicks();
-        if (tempsActuel - tempsPrecedent > TEMPS)
-        {
-            angle += 2; //On augmente l'angle pour que l'image tourne sur elle-même.
- 
-            tempsPrecedent = tempsActuel;
-        }
-        else
-        {
-            SDL_Delay(TEMPS - (tempsActuel - tempsPrecedent));
-        }
- 
-        SDL_FillRect(screen_surface, NULL, SDL_MapRGB(screen_surface->format, 255, 255, 255));
- 
-        rotation = rotozoomSurface(image_surface, angle, 1.0, 1); //On transforme la surface image.
- 
+
+ //On augmente l'angle pour que l'image tourne sur elle-même.
+
+	SDL_FillRect(screen_surface, NULL, SDL_MapRGB(screen_surface->format, 255, 255, 255));
+	rotation = rotozoomSurface(image_surface, angle, 1.0, 1); //On transforme la surface image.
+	rect.x =  500 - rotation->w / 2;
+	rect.y =  500 - rotation->h / 2;
+	rotation = rotozoomSurface(image_surface, angle, 1.0, 1); //On transforme la surface image.
         //On positionne l'image en fonction de sa taille.
-        rect.x =  200 - rotation->w / 2;
-        rect.y =  200 - rotation->h / 2;
- 
         SDL_BlitSurface(rotation , NULL, screen_surface, &rect); //On affiche la rotation de la surface image.
         SDL_FreeSurface(rotation); //On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
- 
         
 	SDL_Flip(screen_surface);
 	wait_for_keypressed();
+	angle+=2;
+        SDL_Flip(screen_surface);
+	SDL_SaveBMP(image_surface,"imagemodif.bmp" );
+	continuer += 1;
     }
 
 	//Rotate function
