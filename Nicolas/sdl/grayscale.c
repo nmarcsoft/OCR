@@ -71,9 +71,11 @@ int main()
 {
 
     SDL_Surface* image_surface;
+    //SDL_Surface* screen_surface;
     init_sdl();
 
     image_surface = load_image("image_01.jpeg");
+    //screen_surface = display_image(image_surface);
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
@@ -91,85 +93,77 @@ int main()
 		// Check if the pixel is black
 		if (r + g + b < 50)
 		{
+			
+			// We have a black pixel
+			// CPT : Count number of white pixels,
+			// if > 980 -> black line detected
+			int cpt = 0;
+			int test = 1;
+			while (j < width-1 && test)
+			{
+			j++;
+			Uint32 pixel = get_pixel(image_surface, i, j);
+			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
+			if (r + g + b < 50)
+			{
+				cpt += 1;
+			}
+			else
+			{
+				test = 0;
+			}
+			}
+			if (cpt > 980)
+			{
+				i += 20;
+				cptWidth += 1;
+			}
+		}
+	}
+    }
+
+    // Now, lets check for the vectical lines
+    // It's the same code but with different index and variables
+    printf("Ligne Horizontale : %d", cptWidth);
+    for (int i = 0; i < width; i++)
+    {
+	for (int j = 0; j < height; j++)
+	{
+		Uint32 pixel = get_pixel(image_surface, j, j);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+		// Check if the pixel is black
+		if (r + g + b < 50)
+		{
+			
 			// We have a black pixel
 			// CPT : Count number of white pixels,
 			// if > 200 -> black line detected
 			int cpt = 0;
 			int test = 1;
-			while (j < width && test)
+			while (j < height-1 && test)
 			{
-			i++;
+			j++;
 			Uint32 pixel = get_pixel(image_surface, i, j);
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-			if ((r + g + b) > 20)
+			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
+			if (r + g + b < 50)
 			{
-				test = 0;
-				//printf("Last pixel spot cpt += ");
+				cpt += 1;
 			}
 			else
 			{
-				if (j == width)
-				{
-					if (cpt > 50)
-					{
-						cptWidth += 1;
-						cpt = 0;
-					}
-				}
-				else
-				{
-					cpt += 1;
-				}
+				test = 0;
 			}
 			}
-			printf("%d\n", cpt);
-			if (cpt > 50)
+			if (cpt > 980)
 			{
-				cptWidth += 1;
-				i += height/20;
-				printf("Jump a line\n");
+				i += 20;
+				cptHeight += 1;
 			}
 		}
 	}
     }
-    /*
-for (int j = 0; j < height; j++)
-    	{
-	for (int i = 0; i < width; i++)
-	{
-		Uint32 pixel = get_pixel(image_surface, i, j);
-		Uint8 r, g, b;
-		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-		if (r + g + b < 10)
-		{
-			// We have a black pixel
-			int test = 1;
-			while (j < height && test)
-			{
-			j++;
-			Uint32 pixel = get_pixel(image_surface, i, j);
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-			if ((r + g + b) > 20)
-			{
-				test = 0;
-			}
-			else
-			{
-				cpt += 1;
-			}
-			}
-			if (cpt > 200)
-			{
-				cptWidth += 1;
-				i += width/200;
-			}
-		}
-	}
-    }*/
-    printf("Ligne droite - gauche : %d ligne haut - bas : %d", cptWidth, 
-		    cptHeight);
+    printf("Ligne Verticale : %d", cptHeight);
     return 0;
     }
 
