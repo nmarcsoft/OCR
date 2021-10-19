@@ -230,7 +230,9 @@ int main()
         SDL_BlitSurface(rotation , NULL, screen_surface, &rect); //On affiche la rotation de la surface image.
         SDL_FreeSurface(rotation); //On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
  
-        SDL_Flip(screen_surface);
+        
+	SDL_Flip(screen_surface);
+	wait_for_keypressed();
     }
 
 	//Rotate function
@@ -238,10 +240,10 @@ int main()
 //https://github.com/mauryquijada/image-manipulation-in-c/blob/master/rotate.c
 	update_surface(screen_surface, image_surface);
 
-    wait_for_keypressed();
+    	wait_for_keypressed();
 	SDL_FreeSurface(image_surface);
-    SDL_FreeSurface(screen_surface);
-void SDL_FreeSurface(SDL_Surface *surface);
+    	SDL_FreeSurface(screen_surface);
+	void SDL_FreeSurface(SDL_Surface *surface);
 
     return 0;
 }
