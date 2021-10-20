@@ -70,53 +70,6 @@ void wait_for_keypressed()
 }
 
 
-/*int rotate(SDL_Surface *img)
-{
-	int cpt = 0;
-	int cptHeight = 0;
-	int width = img->w;
-        int height = img->h;
-	for (int i = 0; i < width; i++)
-	{
-		for (int j = 0; j < height; j++)
-		{
-		Uint32 pixel = get_pixel(img, i, j);
-		Uint8 r, g, b;
-		SDL_GetRGB(pixel, img->format, &r, &g, &b);
-		if (r + g + b < 10)
-		{
-			// We have a black pixel
-			int test = 1;
-			while (i < width && test)
-			{
-			i++;
-			Uint32 pixel = get_pixel(img, i, j);
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel, img->format, &r, &g, &b);
-			if ((r + g + b) > 20)
-			{
-				test = 0;
-			}
-			else
-			{
-				cpt += 1;
-			}
-			}
-			if (cpt > 200)
-			{
-			cptHeight += 1;
-			j += 20;
-			}
-		}
-		}
-	}
-	if(cptHeight > 0)
-		return 1;
-	else
-		return 0;
-
-}*/
-
 int main()
 {
 
@@ -124,7 +77,7 @@ int main()
     SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("images/image_06.jpeg");
+    image_surface = load_image("images/image_04.jpeg");
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
@@ -148,7 +101,7 @@ int main()
  	      put_pixel(image_surface, x, y, pixel2);
  	}
     }
-    int threshold = ((max + mid) / 2)-50;
+    int threshold = ((max + mid) / 2)-max;
     for (int i = 0; i < width; i++)
     {
       for (int j = 0; j < height; j++)
@@ -209,19 +162,16 @@ int main()
 	SDL_Flip(screen_surface);
 	angle+=2;
         SDL_Flip(screen_surface);
-	int a = getchar();
-	if (a == 97)
-	{
-		continuer = 0;
-	}
+	if(getchar() == 97)
+	{continuer = 0;}	
     }
 	SDL_SaveBMP(image_surface,"imagemodif2.bmp" );
 
 
 	//Rotate function
-	
-//https://openclassrooms.com/forum/sujet/nouvelles-dimensions-image-avec-sdl-gfx
-//SDL_Surface * zoomSurface ( SDL_Surface *src, double zoomx, double zoomy, int smooth);
+	double zoomw = 1080/width;
+
+	SDL_SaveBMP(rotozoomSurface(image_surface,1,zoomw,1),"imagemodif3.bmp");
 	update_surface(screen_surface, image_surface);
 	SDL_FreeSurface(image_surface);
     	SDL_FreeSurface(screen_surface);
