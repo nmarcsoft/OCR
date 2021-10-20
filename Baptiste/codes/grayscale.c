@@ -124,7 +124,7 @@ int main()
     SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("images/image_01.jpeg");
+    image_surface = load_image("images/image_06.jpeg");
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
@@ -148,7 +148,7 @@ int main()
  	      put_pixel(image_surface, x, y, pixel2);
  	}
     }
-    int threshold = (max + mid) / 2;
+    int threshold = ((max + mid) / 2)-50;
     for (int i = 0; i < width; i++)
     {
       for (int j = 0; j < height; j++)
@@ -220,7 +220,8 @@ int main()
 
 	//Rotate function
 	
-//https://github.com/mauryquijada/image-manipulation-in-c/blob/master/rotate.c
+//https://openclassrooms.com/forum/sujet/nouvelles-dimensions-image-avec-sdl-gfx
+//SDL_Surface * zoomSurface ( SDL_Surface *src, double zoomx, double zoomy, int smooth);
 	update_surface(screen_surface, image_surface);
 	SDL_FreeSurface(image_surface);
     	SDL_FreeSurface(screen_surface);
