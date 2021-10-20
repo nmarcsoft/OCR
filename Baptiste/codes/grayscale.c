@@ -124,7 +124,7 @@ int main()
     SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("images/image_06.jpeg");
+    image_surface = load_image("images/image_01.jpeg");
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
@@ -180,7 +180,7 @@ int main()
     SDL_WM_SetCaption("Faire des rotations avec SDL_gfx", NULL);
 
     int continuer = 1;
-    while(continuer<20)
+    while(continuer)
     {
         SDL_PollEvent(&event);
         switch(event.type)
@@ -207,19 +207,21 @@ int main()
 	//On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
         
 	SDL_Flip(screen_surface);
-	wait_for_keypressed();
 	angle+=2;
         SDL_Flip(screen_surface);
-	SDL_SaveBMP(image_surface,"imagemodif.bmp" );
-	continuer += 1;
+	int a = getchar();
+	if (a == 97)
+	{
+		continuer = 0;
+	}
     }
+	SDL_SaveBMP(image_surface,"imagemodif2.bmp" );
+
 
 	//Rotate function
 	
 //https://github.com/mauryquijada/image-manipulation-in-c/blob/master/rotate.c
 	update_surface(screen_surface, image_surface);
-
-    	wait_for_keypressed();
 	SDL_FreeSurface(image_surface);
     	SDL_FreeSurface(screen_surface);
 	void SDL_FreeSurface(SDL_Surface *surface);
