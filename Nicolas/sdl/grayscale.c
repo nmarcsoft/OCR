@@ -71,11 +71,11 @@ int main()
 {
 
     SDL_Surface* image_surface;
-    //SDL_Surface* screen_surface;
+    SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("image_01.jpeg");
-    //screen_surface = display_image(image_surface);
+    image_surface = load_image("imagemodif2.bmp");
+    screen_surface = display_image(image_surface);
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
@@ -106,17 +106,18 @@ int main()
 			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
 			if (r + g + b < 50)
 			{
-				cpt += 1;
+			// Create a red pixel
+			cpt += 1;
 			}
 			else
 			{
 				test = 0;
 			}
 			}
-			if (cpt > 980)
+			if (cpt > width-20)
 			{
-				i += 20;
-				cptWidth += 1;
+				i += width/90;
+				cptHeight += 1;
 			}
 		}
 	}
@@ -124,12 +125,12 @@ int main()
 
     // Now, lets check for the vectical lines
     // It's the same code but with different index and variables
-    printf("Ligne Horizontale : %d", cptWidth);
+    printf("Ligne Verticale : %d", cptHeight);
     for (int i = 0; i < width; i++)
     {
 	for (int j = 0; j < height; j++)
 	{
-		Uint32 pixel = get_pixel(image_surface, j, j);
+		Uint32 pixel = get_pixel(image_surface, j, i);
 		Uint8 r, g, b;
 		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 		// Check if the pixel is black
@@ -144,26 +145,31 @@ int main()
 			while (j < height-1 && test)
 			{
 			j++;
-			Uint32 pixel = get_pixel(image_surface, i, j);
+			Uint32 pixel = get_pixel(image_surface, j, i);
 			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
 			if (r + g + b < 50)
 			{
-				cpt += 1;
+					Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 0, 0);
+			// Put the pixel in the image
+			put_pixel(image_surface, j, i, pixel2);
+		cpt += 1;
 			}
 			else
 			{
 				test = 0;
 			}
 			}
-			if (cpt > 980)
+			if (cpt > height-20)
 			{
-				i += 20;
-				cptHeight += 1;
+				i += height/90;
+				cptWidth += 1;
 			}
 		}
 	}
     }
-    printf("Ligne Verticale : %d", cptHeight);
+    printf("Ligne Horizontale : %d", cptWidth);
+    update_surface(screen_surface, image_surface);
+    wait_for_keypressed();
     return 0;
     }
 
