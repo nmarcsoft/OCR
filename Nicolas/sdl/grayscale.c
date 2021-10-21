@@ -66,45 +66,32 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
-
-int main()
+int widthCase(SDL_Surface* image_surface, int width, int height)
 {
-
-    SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
-    init_sdl();
-
-    image_surface = load_image("imagemodif2.bmp");
-    screen_surface = display_image(image_surface);
-    // VARIABLES :
-    // cptHeight -> count lines vertical
-    // cptWidth -> count lines horizontal
-    int cptHeight = 0;
-    int cptWidth = 0;
-    int width = image_surface->w;
-    int height = image_surface->h;
-    for (int i = 0; i < height; i++)
+    int toReturn = 0;
+    int test;
+for (int i = 0; i < height; i++)
     {
 	for (int j = 0; j < width; j++)
 	{
-		Uint32 pixel = get_pixel(image_surface, i, j);
+		Uint32 pixel = get_pixel(image_surface, j, i);
 		Uint8 r, g, b;
 		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 		// Check if the pixel is black
-		if (r + g + b < 50)
+		if (r == 0)
 		{
 			
 			// We have a black pixel
 			// CPT : Count number of white pixels,
 			// if > 980 -> black line detected
 			int cpt = 0;
-			int test = 1;
+			test = 1;
 			while (j < width-1 && test)
 			{
 			j++;
-			Uint32 pixel = get_pixel(image_surface, i, j);
+			Uint32 pixel = get_pixel(image_surface, j, i);
 			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
-			if (r + g + b < 50)
+			if (r == 0)
 			{
 			// Create a red pixel
 			cpt += 1;
@@ -114,62 +101,172 @@ int main()
 				test = 0;
 			}
 			}
+			// Test if we have many black pixels -> it's a lin
 			if (cpt > width-20)
 			{
 				i += width/90;
-				cptHeight += 1;
+				toReturn = cpt/9;
+				
+				break;
 			}
 		}
 	}
+	if (test)
+	{
+		break;
+	}
     }
+	return toReturn;
+}
 
-    // Now, lets check for the vectical lines
-    // It's the same code but with different index and variables
-    printf("Ligne Verticale : %d", cptHeight);
-    for (int i = 0; i < width; i++)
+int heightCase(SDL_Surface* image_surface, int width, int height)
+{
+int test = 0;
+int caseY = 0;
+	for (int i = 0; i < width; i++)
     {
 	for (int j = 0; j < height; j++)
 	{
-		Uint32 pixel = get_pixel(image_surface, j, i);
+		Uint32 pixel = get_pixel(image_surface, i, j);
 		Uint8 r, g, b;
 		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 		// Check if the pixel is black
-		if (r + g + b < 50)
+		if (r == 0)
 		{
 			
 			// We have a black pixel
 			// CPT : Count number of white pixels,
 			// if > 200 -> black line detected
 			int cpt = 0;
-			int test = 1;
+			test = 1;
 			while (j < height-1 && test)
 			{
 			j++;
-			Uint32 pixel = get_pixel(image_surface, j, i);
+			Uint32 pixel = get_pixel(image_surface, i, j);
 			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
-			if (r + g + b < 50)
+			if (r == 0)
 			{
-					Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 0, 0);
 			// Put the pixel in the image
-			put_pixel(image_surface, j, i, pixel2);
-		cpt += 1;
+			cpt += 1;
 			}
 			else
 			{
 				test = 0;
 			}
 			}
+			// Test if we have many black pixels -> it's a line
 			if (cpt > height-20)
 			{
 				i += height/90;
-				cptWidth += 1;
+				caseY = cpt/9;
+				break;
 			}
 		}
 	}
     }
-    printf("Ligne Horizontale : %d", cptWidth);
-    update_surface(screen_surface, image_surface);
-    wait_for_keypressed();
-    return 0;
+	return caseY;
+ 
+}
+
+
+// FUNCTION that check if on the 5 next pixel, from top to bot, we
+// have the same color of pixel
+//
+// To check black -----> value = 0
+// To check white -----> value = 765
+int getAround(SDL_Surface* image_surface, int x, int y, int value)
+{
+	Uint8 r, g, b;
+	int toReturn = 0;
+	Uint32 pixel = get_pixel(image_surface, x, y);
+	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+	int test;
+	for (int i = 1; i < 10; i++)
+	{
+		test = 0;
+		for (int j = 1; j < 90; j++)
+		{
+			Uint32 pixel = get_pixel(image_surface, x+j, y+i);
+			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+			if (r + g + b != value)
+			{
+				break;
+			}
+			test+=1;
+		}
+		if (test != 89)
+		{
+			break;
+		}
+		else {
+			if (i == 9)
+			{
+				toReturn = 1;
+			}
+		}
+	}
+	return toReturn;
+}
+
+// Put caseX*caseY pixel from (x, y) in "from" -> to "to"
+void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
+		int caseX, int caseY)
+{
+	for (int j = 0; j < caseY; j++)
+	{
+	   for (int k = 0; k < caseX; k++)
+	   {
+		Uint32 pixel = get_pixel(from, x+k, y+j);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, from->format,&r, &g, &b);
+	   	Uint32 pixel2 = SDL_MapRGB(to->format, r, g, b);
+		put_pixel(to, k, j, pixel2);
+	   }
+	}
+	SDL_SaveBMP(to, "out.bmp");
+}
+
+int main()
+{
+
+    SDL_Surface* image_surface;
+    SDL_Surface* screen_surface;
+    SDL_Surface* case1;
+    init_sdl();
+
+    image_surface = load_image("imagemodif2.bmp");
+    case1 = load_image("index.jpg");
+    screen_surface = display_image(image_surface);
+    // VARIABLES :
+    // cptHeight -> count lines vertical
+    // cptWidth -> count lines horizontal
+    int width = image_surface->w;
+    int height = image_surface->h;
+    int caseX = widthCase(image_surface, width, height)-20;
+    int caseY = heightCase(image_surface, width, height)-20  ;
+    int tmp = 0;
+    for (int y = 0; y < height; y++)
+    {
+	for (int x = 0; x < width; x++)
+	{
+	    if(getAround(image_surface, x, y, 765))
+	    {
+		copySurface(image_surface, case1, x, y, caseX, caseY);
+		x += caseX;
+		tmp += 1;
+	    }
+	    if (tmp == 1)
+	    {
+		break;
+	    }
+	}
+	if (tmp == 1)
+	{
+		break;
+	}
     }
+    update_surface(screen_surface, image_surface);
+    //wait_for_keypressed();
+    return 0;
+}
 

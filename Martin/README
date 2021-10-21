@@ -4,6 +4,7 @@ TODO :
 
 ==========
 gcc -Wall -Wno-unused-variable -Wextra -Werror -lm -std=c99 -O0 -o main *.c
+gcc -Wall -Wextra -lm -std=c99 -O0 -o main *.c
 
 
 https://gist.github.com/siddydutta/a1b48b428ddeffbd5c8dc92a3cf9a625

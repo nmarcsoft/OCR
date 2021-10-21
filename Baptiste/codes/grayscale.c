@@ -69,15 +69,14 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
-
-int main()
+int main() 
 {
 
     SDL_Surface* image_surface;
     SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("images/image_01.jpeg");
+    image_surface = load_image("images/image01rot.jpg");
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
@@ -87,71 +86,78 @@ int main()
     //average image color calcul
     for(int x = 0; x < width; x++)
     {
- 	for(int y = 0; y < height;y++)
- 	{
- 	      Uint32 pixel = get_pixel(image_surface, x, y);
- 	      Uint8 r, g, b;
- 	      SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
- 	      mid = 0.3*r + 0.59*g + 0.11*b;
- 	      if (mid <min)
- 	      {min = mid;}
- 	      if(mid > max)
- 	      {max = mid;}
- 	      Uint32 pixel2 = SDL_MapRGB(image_surface->format, mid, mid, mid);
- 	      put_pixel(image_surface, x, y, pixel2);
- 	}
+  for(int y = 0; y < height;y++)
+  {
+       Uint32 pixel = get_pixel(image_surface, x, y);
+       Uint8 r, g, b;
+       SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
+       mid = 0.3*r + 0.59*g + 0.11*b;
+       if (mid <min)
+       {min = mid;}
+       if(mid > max)
+       {max = mid;}
+       Uint32 pixel2 = SDL_MapRGB(image_surface->format, mid, mid, mid);
+       put_pixel(image_surface, x, y, pixel2);
+  }
     }
     int threshold = ((max + mid) / 2)-50;
     for (int i = 0; i < width; i++)
     {
       for (int j = 0; j < height; j++)
       {
-	Uint32 pixel = get_pixel(image_surface, i, j);
-	Uint8 r, g, b;
-	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-	Uint8 t = (r + g + b)/3;
-	if(t>threshold)
-	{
-	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 255, 255);
-	   put_pixel(image_surface, i, j, pixel2);
-	}
-	else
-	{
-	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
-	   put_pixel(image_surface, i, j, pixel2);
-	}
+Uint32 pixel = get_pixel(image_surface, i, j);
+Uint8 r, g, b;
+SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+Uint8 t = (r + g + b)/3;
+if(t>threshold)
+{
+  Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 255, 255);
+  put_pixel(image_surface, i, j, pixel2);
+}
+else
+{
+  Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
+  put_pixel(image_surface, i, j, pixel2);
+}
       }
     }
 
 
-	int angle = 0;
-    for (int i = 0; i < width; i++)
+
+
+float angletorotate = 0;
+int i =0;
+int j = 0;
+int r = 0;
+    for (; i < height; i++)
     {
-      for (int j = 0; j < height; j++)
+      for (; j < width; j++)
       {
-        Uint32 pixel = get_pixel(image_surface, i, j);
+        Uint32 pixel = get_pixel(image_surface, j, i);
         Uint8 r, g, b;
         SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-        
         if(r==0)
-        {	
-		
-		Uint32 pixel2 = get_pixel(image_surface, i, j);
-          	while() 
-	  	{
-	   	
-	  	}
-        }
-        else
-        {
-           Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
-           put_pixel(image_surface, i, j, pixel2);
-        }
+        {break;}
       }
-    }    
+      if(r==0)
+      {break;}
+    }
+int x = i;
+printf("%d",i);
+while(angletorotate == 0 && x>0) 
+{
+Uint32 pixel2 = get_pixel(image_surface, x, j+20);
+Uint8 r2, g2, b2;
+SDL_GetRGB(pixel2, image_surface->format, &r2, &g2, &b2);
+
+angletorotate = (j+20)/(i-x);
+printf("%.2f",angletorotate);
+x--;
+}
 
 
-    SDL_Surface *rotation = NULL;
+
+   SDL_Surface *rotation = NULL;
     SDL_Event event;
     SDL_Rect rect;
     double angle = 0;
@@ -167,43 +173,50 @@ int main()
         switch(event.type)
         {
             case SDL_QUIT:
-		continuer = 0;
+continuer = 0;
                 break;
         }
 
  //On augmente l'angle pour que l'image tourne sur elle-même.
 
-	SDL_FillRect(screen_surface, NULL, SDL_MapRGB
-			(screen_surface->format, 255, 255, 255));
-	rotation = rotozoomSurface(image_surface, angle, 1.0, 1); 
-	//On transforme la surface image.
-	rect.x =  500 - rotation->w / 2;
-	rect.y =  500 - rotation->h / 2;
-	rotation = rotozoomSurface(image_surface, angle, 1.0, 1);
-	//On transforme la surface image.
+SDL_FillRect(screen_surface, NULL, SDL_MapRGB
+(screen_surface->format, 255, 255, 255));
+rotation = rotozoomSurface(image_surface, angle, 1.0, 1); 
+//On transforme la surface image.
+rect.x =  500 - rotation->w / 2;
+rect.y =  500 - rotation->h / 2;
+rotation = rotozoomSurface(image_surface, angle, 1.0, 1);
+//On transforme la surface image.
         //On positionne l'image en fonction de sa taille.
         SDL_BlitSurface(rotation , NULL, screen_surface, &rect); 
-	//On affiche la rotation de la surface image.
+//On affiche la rotation de la surface image.
         SDL_FreeSurface(rotation);
-	//On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
+//On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
         
-	SDL_Flip(screen_surface);
-	angle+=2;
+SDL_Flip(screen_surface);
+angle+=2;
         SDL_Flip(screen_surface);
-	if(getchar() == 97)
-	{continuer = 0;}	
+int a = getchar();
+if (a == 97)
+{
+continuer = 0;
+}
     }
+SDL_SaveBMP(image_surface,"imagemodif2.bmp" );
 
-	SDL_SaveBMP(image_surface,"imagemodif2.bmp" );
-	//Rotate function
-	//double zoomw = 1080/width;
-	//double zoomh = 1080/height;
 
-	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"imagemodif3.bmp");
-	update_surface(screen_surface, image_surface);
-	SDL_FreeSurface(image_surface);
-    	SDL_FreeSurface(screen_surface);
-	void SDL_FreeSurface(SDL_Surface *surface);
+
+//Rotate function
+//https://openclassrooms.com/forum/sujet/nouvelles-dimensions-image-avec-sdl-gfx
+//SDL_Surface * zoomSurface ( SDL_Surface *src, double zoomx, double zoomy, int smooth);
+
+SDL_SaveBMP(rotozoomSurface(image_surface,angletorotate,1,1),"imagemodif3.bmp");
+printf("%.2f",angletorotate);
+update_surface(screen_surface, image_surface);
+SDL_FreeSurface(image_surface);
+    SDL_FreeSurface(screen_surface);
+void SDL_FreeSurface(SDL_Surface *surface);
 
     return 0;
 }
+
