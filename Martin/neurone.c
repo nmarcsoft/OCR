@@ -6,7 +6,11 @@
 #include <time.h>
 
 double sigmoid(double value){
-    	return 1 / exp(-value);
+    	return 1 / (1 + exp(-value));
+}
+
+double sigmoid_derivative(double value){
+	return value * (1 - value);
 }
 
 double grd(){//Generate random value
@@ -32,11 +36,11 @@ double initialize(){
 	double lr = 0.1;
 	int inputLayersNeurons = 2;
 	int hiddenLayerNeurons = 2;
-	int outpuyLayerNeurons = 1;
+	int outputLayerNeurons = 1;
 	
 	//RANDOM GENERATION OF WEIGHT
 	//
-	//ATTENTION WEIGHTS IS AlWAYS THE SAME FOR THE MOMENT
+	//CAUTION WEIGHTS IS AlWAYS THE SAME FOR THE MOMENT
 	double w1 = grd();
 	double w2 = grd();
 	double w3 = grd();
@@ -65,19 +69,86 @@ double initialize(){
 		{w9}
 	};
 	
+	
+
 	double hidden_layer_activation[4][2] = {
 		{0,0},
 		{0,0},
 		{0,0},
 		{0,0}
 	};
-
 	double hw00;
 	double hw01;
 	double hw10;
 	double hw11;
+
+	double hidden_layer_output[4][2] = {
+		{0,0},
+		{0,0},
+		{0,0},
+		{0,0}
+	};
+
+	double output_layer_activation[4][1] = {
+		{0},
+		{0},
+		{0},
+		{0}
+	};
+
+	
+	double hlo;//hidden_layer_output
+	double ow;//output_weight
+	double ob;//output_bias
+	
+	double predicted_output[4][1] = {
+		{0},
+		{0},
+		{0},
+		{0}
+	};
+	double error[4][1] = {
+		{0},
+		{0},
+		{0},
+		{0}
+	};
+
+	double d_predicted_output[4][1] = {
+		{0},
+		{0},
+		{0},
+		{0}
+	};
+
+	double sigmod_predicted_output[4][1] = {
+		{0},
+		{0},
+		{0},
+		{0}
+	};
+
+	double error_hidden_layer[4][2] = {
+		{0,0},
+		{0,0},
+		{0,0},
+		{0,0}
+	};
+	double output_weights_t[1][2] = {
+		{0,0}
+	};
+	
+	double ehl00;
+	double ehl01;
+	double ehl10;
+	double ehl11;
+	double ehl20;
+	double ehl21;
+	double ehl30;
+	double ehl31;
 	//Training algorithm
 	for(int i = 0; i < epochs; i++){
+		//First step
 		hw00 = hidden_weights[0][0];
 		hw01 = hidden_weights[0][1];
 		hw10 = hidden_weights[1][0];
@@ -88,9 +159,67 @@ double initialize(){
 		hidden_layer_activation[2][1] += hw01;
 		hidden_layer_activation[3][0] += hw00 + hw10;
 		hidden_layer_activation[3][1] += hw01 + hw11;
+		
 
+		//Second step
+		hidden_layer_activation[0][0] = hidden_bias[0][0];
+		hidden_layer_activation[0][1] = hidden_bias[0][1];
+		//Third step
+		for(int x = 0; x < 4; x++){
+			for(int j = 0; j < 2; j++){
+hidden_layer_output[x][j] = sigmoid(hidden_layer_activation[x][j]); //indent
+			}
+		}
+
+		//4th step
+		int R1 = 4;
+		int C2 = 1;
+		int R2 = 2;
+		for (int x = 0; x < R1; x++) {
+        		for (int j = 0; j < C2; j++) {
+				output_layer_activation[x][j] = 0;
+				for (int k = 0; k < R2; k++) {
+					hlo = hidden_layer_output[x][k];
+					ow = output_weights[k][j];
+output_layer_activation[x][j] += hlo * ow; //Indent
+				}
+			}
+		}
+
+		//5th step
+		ob = output_bias[0][0];
+		for(int x = 0; x < 4; x++){
+			output_layer_activation[x][0] += ob;
+		}
+		
+		//6th step
+		for(int x = 0; x < 4; x++){
+predicted_output[x][0] = sigmoid(output_layer_activation[x][0]); //indent
+		}
+		
+		//7th step
+		for(int x = 0; x < 4; x++){
+error[x][0] = expected_output[x] - predicted_output[x][0];//indent
+		}
+
+		//8th step
+		for(int x = 0; x < 4; x++){
+sigmod_predicted_output[x][0] = sigmoid_derivative(predicted_output[x][0]);
+		}
+		for(int x = 0; x < 4; x++){
+d_predicted_output[x][0] = error[x][0] * sigmod_predicted_output[x][0];
+		}
+		//9th step
+		for(int x = 0; x < 2; x++){
+			output_weights_t[0][x] = output_weights[x][0];
+		}
+		//The problem start here
+		for(int x = 0; x < 2; x++){
+			for(int j = 0; j < 4; j++){
+error_hidden_layer[x][j] = output_weights_t[0][x] * d_predicted_output[j][0];
+			}
+		}
 	}
-
 	    /*printf("[%d,%d]", output[i][0], output[i][1]);*/
     
     	//printf("\n");
