@@ -181,11 +181,12 @@ int getAround(SDL_Surface* image_surface, int x, int y, int value)
 	Uint32 pixel = get_pixel(image_surface, x, y);
 	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 	int test;
-	for (int i = 1; i < 5; i++)
+	for (int i = 1; i < 10; i++)
 	{
 		test = 0;
-		for (int j = 1; j < 5; j++)
+		for (int j = 1; j < 90; j++)
 		{
+			Uint32 pixel = get_pixel(image_surface, x+j, y+i);
 			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 			if (r + g + b != value)
 			{
@@ -193,12 +194,12 @@ int getAround(SDL_Surface* image_surface, int x, int y, int value)
 			}
 			test+=1;
 		}
-		if (test != 4)
+		if (test != 89)
 		{
 			break;
 		}
 		else {
-			if (i == 4)
+			if (i == 9)
 			{
 				toReturn = 1;
 			}
@@ -215,7 +216,6 @@ void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
 	{
 	   for (int k = 0; k < caseX; k++)
 	   {
-		printf("loop Copy\n");
 		Uint32 pixel = get_pixel(from, x+k, y+j);
 		Uint8 r, g, b;
 		SDL_GetRGB(pixel, from->format,&r, &g, &b);
@@ -244,27 +244,23 @@ int main()
     int height = image_surface->h;
     int caseX = widthCase(image_surface, width, height)-20;
     int caseY = heightCase(image_surface, width, height)-20  ;
-    printf("Out of loop : %d\n", caseX);
-    printf("Out of loop : %d\n", caseY);
     int tmp = 0;
     for (int y = 0; y < height; y++)
     {
 	for (int x = 0; x < width; x++)
 	{
-	    printf("Verification for x = %d, y = %d", x, y);
 	    if(getAround(image_surface, x, y, 765))
 	    {
-		printf("In Copy");
 		copySurface(image_surface, case1, x, y, caseX, caseY);
-		printf("Done");
-		tmp = 1;
+		x += caseX;
+		tmp += 1;
 	    }
-	    if (tmp)
+	    if (tmp == 1)
 	    {
 		break;
 	    }
 	}
-	if (tmp)
+	if (tmp == 1)
 	{
 		break;
 	}
