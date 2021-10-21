@@ -77,7 +77,7 @@ int main()
     SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("images/image_06.jpeg");
+    image_surface = load_image("images/image_05.jpeg");
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
@@ -119,3 +119,93 @@ int main()
 	{
 	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
 	   put_pixel(image_surface, i, j, pixel2);
+	}
+      
+      }
+    }
+
+float angletorotate = 0;
+int i =0;
+int j = 0;
+int r = 0;
+    for (; i < height; i++)
+    {
+      for (; j < width; j++)
+      {
+        Uint32 pixel = get_pixel(image_surface, j, i);
+        Uint8 r, g, b;
+        SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+        if(r==0)
+        {break;}
+      }
+      if(r==0)
+      {break;}
+    }
+int x = i;
+while(angletorotate == 0 && x>0)
+{
+	Uint32 pixel2 = get_pixel(image_surface, x, j+20);
+	Uint8 r2, g2, b2;
+	SDL_GetRGB(pixel2, image_surface->format, &r2, &g2, &b2);
+	if(r2 == 0)
+	{
+		float t = (j+20)/(i-x);
+		angletorotate = atanf(t);
+	}
+	x--;
+}
+
+
+   SDL_Surface *rotation = NULL;
+    SDL_Event event;
+    SDL_Rect rect;
+    double angle = 0;
+
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_WM_SetCaption("Faire des rotations avec SDL_gfx", NULL);
+
+    int continuer = 1;
+    while(continuer)
+    {
+        SDL_PollEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+continuer = 0;
+                break;
+        }
+
+ //On augmente l'angle pour que l'image tourne sur elle-même.
+
+SDL_FillRect(screen_surface, NULL, SDL_MapRGB
+(screen_surface->format, 255, 255, 255));
+rotation = rotozoomSurface(image_surface, angle, 1.0, 1);
+//On transforme la surface image.
+rect.x =  500 - rotation->w / 2;
+rect.y =  500 - rotation->h / 2;
+rotation = rotozoomSurface(image_surface, angle, 1.0, 1);
+//On transforme la surface image.
+        //On positionne l'image en fonction de sa taille.
+        SDL_BlitSurface(rotation , NULL, screen_surface, &rect);
+//On affiche la rotation de la surface image.
+        SDL_FreeSurface(rotation);
+//On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire.
+
+SDL_Flip(screen_surface);
+angle+=2;
+        SDL_Flip(screen_surface);
+int a = getchar();
+if (a == 97)
+{
+continuer = 0;
+}
+}
+SDL_SaveBMP(rotozoomSurface(image_surface,angletorotate,1,1),"imagemodif3.bmp");
+update_surface(screen_surface, image_surface);
+SDL_FreeSurface(image_surface);
+    SDL_FreeSurface(screen_surface);
+void SDL_FreeSurface(SDL_Surface *surface);
+
+    return 0;
+}
