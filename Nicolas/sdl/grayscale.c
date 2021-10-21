@@ -146,9 +146,7 @@ int caseY = 0;
 			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
 			if (r == 0)
 			{
-				Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 0, 0);
 			// Put the pixel in the image
-			put_pixel(image_surface, j, i, pixel2);
 			cpt += 1;
 			}
 			else
@@ -173,13 +171,15 @@ int caseY = 0;
 
 // FUNCTION that check if on the 5 next pixel, from top to bot, we
 // have the same color of pixel
-int getAround(SDL_Surface* image_surface, int x, int y)
+//
+// To check black -----> value = 0
+// To check white -----> value = 765
+int getAround(SDL_Surface* image_surface, int x, int y, int value)
 {
 	Uint8 r, g, b;
 	int toReturn = 0;
 	Uint32 pixel = get_pixel(image_surface, x, y);
 	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-	int beEqual = r + g + b;
 	int test;
 	for (int i = 1; i < 5; i++)
 	{
@@ -187,7 +187,7 @@ int getAround(SDL_Surface* image_surface, int x, int y)
 		for (int j = 1; j < 5; j++)
 		{
 			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-			if (r + g + b != beEqual)
+			if (r + g + b != value)
 			{
 				break;
 			}
@@ -207,25 +207,68 @@ int getAround(SDL_Surface* image_surface, int x, int y)
 	return toReturn;
 }
 
+// Put caseX*caseY pixel from (x, y) in "from" -> to "to"
+void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
+		int caseX, int caseY)
+{
+	for (int j = 0; j < caseY; j++)
+	{
+	   for (int k = 0; k < caseX; k++)
+	   {
+		printf("loop Copy\n");
+		Uint32 pixel = get_pixel(from, x+k, y+j);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, from->format,&r, &g, &b);
+	   	Uint32 pixel2 = SDL_MapRGB(to->format, r, g, b);
+		put_pixel(to, k, j, pixel2);
+	   }
+	}
+	SDL_SaveBMP(to, "out.bmp");
+}
+
 int main()
 {
 
     SDL_Surface* image_surface;
     SDL_Surface* screen_surface;
+    SDL_Surface* case1;
     init_sdl();
 
     image_surface = load_image("imagemodif2.bmp");
+    case1 = load_image("index.jpg");
     screen_surface = display_image(image_surface);
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
     int width = image_surface->w;
     int height = image_surface->h;
-    int caseX = widthCase(image_surface, width, height);
-    int caseY = heightCase(image_surface, width, height);
+    int caseX = widthCase(image_surface, width, height)-20;
+    int caseY = heightCase(image_surface, width, height)-20  ;
     printf("Out of loop : %d\n", caseX);
     printf("Out of loop : %d\n", caseY);
-    printf("%d\n", getAround(image_surface, 158, 174));
+    int tmp = 0;
+    for (int y = 0; y < height; y++)
+    {
+	for (int x = 0; x < width; x++)
+	{
+	    printf("Verification for x = %d, y = %d", x, y);
+	    if(getAround(image_surface, x, y, 765))
+	    {
+		printf("In Copy");
+		copySurface(image_surface, case1, x, y, caseX, caseY);
+		printf("Done");
+		tmp = 1;
+	    }
+	    if (tmp)
+	    {
+		break;
+	    }
+	}
+	if (tmp)
+	{
+		break;
+	}
+    }
     update_surface(screen_surface, image_surface);
     //wait_for_keypressed();
     return 0;
