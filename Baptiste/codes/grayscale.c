@@ -77,7 +77,7 @@ int main()
     SDL_Surface* screen_surface;
     init_sdl();
 
-    image_surface = load_image("images/image_04.jpeg");
+    image_surface = load_image("images/image_01.jpeg");
     screen_surface = display_image(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
@@ -101,7 +101,7 @@ int main()
  	      put_pixel(image_surface, x, y, pixel2);
  	}
     }
-    int threshold = ((max + mid) / 2)-max;
+    int threshold = ((max + mid) / 2)-50;
     for (int i = 0; i < width; i++)
     {
       for (int j = 0; j < height; j++)
@@ -122,6 +122,34 @@ int main()
 	}
       }
     }
+
+
+	int angle = 0;
+    for (int i = 0; i < width; i++)
+    {
+      for (int j = 0; j < height; j++)
+      {
+        Uint32 pixel = get_pixel(image_surface, i, j);
+        Uint8 r, g, b;
+        SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+        
+        if(r==0)
+        {	
+		
+		Uint32 pixel2 = get_pixel(image_surface, i, j);
+          	while() 
+	  	{
+	   	
+	  	}
+        }
+        else
+        {
+           Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
+           put_pixel(image_surface, i, j, pixel2);
+        }
+      }
+    }    
+
 
     SDL_Surface *rotation = NULL;
     SDL_Event event;
@@ -165,13 +193,13 @@ int main()
 	if(getchar() == 97)
 	{continuer = 0;}	
     }
+
 	SDL_SaveBMP(image_surface,"imagemodif2.bmp" );
-
-
 	//Rotate function
-	double zoomw = 1080/width;
+	//double zoomw = 1080/width;
+	//double zoomh = 1080/height;
 
-	SDL_SaveBMP(rotozoomSurface(image_surface,1,zoomw,1),"imagemodif3.bmp");
+	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"imagemodif3.bmp");
 	update_surface(screen_surface, image_surface);
 	SDL_FreeSurface(image_surface);
     	SDL_FreeSurface(screen_surface);
