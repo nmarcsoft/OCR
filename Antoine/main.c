@@ -16,7 +16,7 @@ void print(int arr[N][N])
 }
 
 
-void print_in_txt(int arr[N][N])
+/*void print_in_txt(int arr[N][N])
 {
 	FILE *fptr;
 	fptr = fopen("/home/antoll/Desktop/EPITA/PROJET/OCR/Antoine/grid_00.result","w");
@@ -39,7 +39,7 @@ void print_in_txt(int arr[N][N])
 		}
 		fputs("\n", fptr);
 	}
-}
+}*/
 
 void print_in_txt_v2(int arr[N][N])
 {
@@ -67,25 +67,74 @@ void print_in_txt_v2(int arr[N][N])
 			fputs("\n", fptr);
 		}
 	}
-}	
+}
+	 
 
-
-	
 
 int main()
 {
-    int grid[9][9] = { { 0, 0, 0, 0, 0, 4, 5, 8, 0 },
-                       { 0, 0, 0, 7, 2, 1, 0, 0, 3 },
-                       { 4, 0, 3, 0, 0, 0, 0, 0, 0 },
-                       { 2, 1, 0, 0, 6, 7, 0, 0, 4 },
-                       { 0, 7, 0, 0, 0, 0, 2, 0, 0 },
-                       { 6, 3, 0, 0, 4, 9, 0, 0, 1 },
-                       { 3, 0, 6, 0, 0, 0, 0, 0, 0 },
-                       { 0, 0, 0, 1, 5, 8, 0, 0, 6 },
-                       { 0, 0, 0, 0, 0, 6, 9, 5, 0 } };
+   int e[9][9]={{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                       { 0, 0, 0, 0, 0, 0, 0, 0, 0 }};
 
-    if (solveSudoku(grid, 0, 0)==1)
-        print_in_txt_v2(grid);
+    
+    FILE *fptr;
+    if((fptr = 
+fopen("/home/antoll/Desktop/EPITA/PROJET/OCR/Antoine/grid_00","r")) 
+		    == NULL){
+	    printf("No such file given called grid_00 is in the repository");
+	    exit(1);
+    }
+    char c;
+    int i = 0;
+    int j = 0;
+    int space = 0;
+    int ligne = 0;
+    while((c = fgetc(fptr)) != EOF)
+    {
+   	    if(j > 8)
+        {
+		    j = 0;
+		    i +=1;
+	    }
+        /*
+	if(c == '.'){
+		e[i][j] = 0;
+		j+=1;
+	}
+	if(c == ' '){
+		space +=1;
+	}
+	else{
+		e[i][j] = c-48;
+		j+=1;
+	}*/
+	    switch(c)
+	    {
+		    case('.'):
+			    e[i][j] = 0;
+			    j+=1;
+			    break;
+		    case(' '):
+			    space +=1;
+			    break;
+		    case(10):
+			    ligne +=1;
+			    break;
+		    default:
+			    e[i][j] = c -48;
+			    j+=1;
+	    }
+    }
+    //print(e);
+    if (solveSudoku(e, 0, 0)==1)
+        print_in_txt_v2(e);
     else
         printf("No solution exists");
 
