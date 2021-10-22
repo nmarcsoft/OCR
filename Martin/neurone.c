@@ -24,7 +24,7 @@ double grd(){//Generate random value
 double initialize(){
 	
 	//Input datasets
-	int output[4][2] = {
+	int inputs[4][2] = {
 		{0,0},
 		{0,1},
 		{1,0},
@@ -32,7 +32,7 @@ double initialize(){
 	};
 	int expected_output[4] = {0,1,1,0};
 
-	int epochs = 10000;
+	int epochs = 100000;
 	double lr = 0.1;
 	int inputLayersNeurons = 2;
 	int hiddenLayerNeurons = 2;
@@ -96,10 +96,19 @@ double initialize(){
 		{0}
 	};
 	
+	
+	double hidden_layer_output_t_dot[2][1] = {
+		{0},
+		{0}
+	};
 
 	double hidden_layer_output_t[2][4] = {
 		{0,0,0,0},
 		{0,0,0,0}
+	};
+
+	double d_predicted_output_sum[1][1] = {
+		{0}
 	};
 	
 	double hlo;//hidden_layer_output
@@ -117,6 +126,16 @@ double initialize(){
 		{0},
 		{0},
 		{0}
+	};
+
+	double inputs_t[2][4]={
+		{0,0,1,1},
+		{0,1,0,1}
+	};
+
+	double inputs_t_dot[2][2] = {
+		{0,0},
+		{0,0}
 	};
 
 	double d_predicted_output[4][1] = {
@@ -154,6 +173,10 @@ double initialize(){
 		{0,0}
 	};
 
+	double d_hidden_layer_sum[1][2] = {
+		{0,0}
+	};
+
 
 	double output_weights_t[1][2] = {
 		{0,0}
@@ -167,24 +190,35 @@ double initialize(){
 	double ehl21;
 	double ehl30;
 	double ehl31;
+
+	int R1;
+	int C2;
+	int R2;
 	//Training algorithm
 	for(int i = 0; i < epochs; i++){
+		printf("Epoch : %d \n", i);
+printf("[%lf,%lf,%lf,%lf]", predicted_output[0][0], predicted_output[0][1],
+			    predicted_output[0][2],
+			    predicted_output[0][3]);
+  
 		//First step
-		hw00 = hidden_weights[0][0];
-		hw01 = hidden_weights[0][1];
-		hw10 = hidden_weights[1][0];
-		hw11 = hidden_weights[1][1];
-		hidden_layer_activation[1][0] += hw10;
-		hidden_layer_activation[1][1] += hw11;
-		hidden_layer_activation[2][0] += hw00;
-		hidden_layer_activation[2][1] += hw01;
-		hidden_layer_activation[3][0] += hw00 + hw10;
-		hidden_layer_activation[3][1] += hw01 + hw11;
-		
+		R1 = 4;
+		C2 = 2;
+		R2 = 2;
+		for (int x = 0; x < R1; x++) {
+        		for (int j = 0; j < C2; j++) {
+				hidden_layer_activation[x][j] = 0;
+				for (int k = 0; k < R2; k++) {
+					hlo = inputs[x][k];
+					ow = hidden_weights[k][j];
+hidden_layer_activation[x][j] += hlo * ow;
+				}
+			}
+		}
 
 		//Second step
-		hidden_layer_activation[0][0] = hidden_bias[0][0];
-		hidden_layer_activation[0][1] = hidden_bias[0][1];
+		hidden_layer_activation[0][0] += hidden_bias[0][0];
+		hidden_layer_activation[0][1] += hidden_bias[0][1];
 		//Third step
 		for(int x = 0; x < 4; x++){
 			for(int j = 0; j < 2; j++){
@@ -193,9 +227,9 @@ hidden_layer_output[x][j] = sigmoid(hidden_layer_activation[x][j]); //indent
 		}
 
 		//4th step
-		int R1 = 4;
-		int C2 = 1;
-		int R2 = 2;
+		R1 = 4;
+		C2 = 1;
+		R2 = 2;
 		for (int x = 0; x < R1; x++) {
         		for (int j = 0; j < C2; j++) {
 				output_layer_activation[x][j] = 0;
@@ -235,9 +269,17 @@ d_predicted_output[x][0] = error[x][0] * sigmod_predicted_output[x][0];
 		for(int x = 0; x < 2; x++){
 			output_weights_t[0][x] = output_weights[x][0];
 		}
-		for(int x = 0; x < 2; x++){
-			for(int j = 0; j < 4; j++){
-error_hidden_layer[j][x] = output_weights_t[0][x] * d_predicted_output[j][0];
+		R1 = 4;
+		C2 = 2;
+		R2 = 1;
+		for (int x = 0; x < R1; x++) {
+        		for (int j = 0; j < C2; j++) {
+				error_hidden_layer[x][j] = 0;
+				for (int k = 0; k < R2; k++) {
+					hlo = d_predicted_output[x][k];
+					ow = output_weights_t[k][j];
+error_hidden_layer[x][j] += hlo * ow; //Indent
+				}
 			}
 		}
 
@@ -259,8 +301,76 @@ d_hidden_layer[x][j] = error_hidden_layer[x][j] * sigmod_hlo[x][j];
 hidden_layer_output_t[j][x] = hidden_layer_output[x][j];
 			}
 		}
+		R1 = 2;
+		C2 = 1;
+		R2 = 4;
+		for (int x = 0; x < R1; x++) {
+        		for (int j = 0; j < C2; j++) {
+				hidden_layer_output_t_dot[x][j] = 0;
+				for (int k = 0; k < R2; k++) {
+					hlo = hidden_layer_output_t[x][k];
+					ow = d_predicted_output[k][j];
+hidden_layer_output_t_dot[x][j] += hlo * ow; //Indent
+				}
+			}
+		}
+		for(int x = 0; x < 2; x++){
+output_weights[x][0] += hidden_layer_output_t_dot[x][0] * lr;
+		}
+
+		//12th step
+		for(int x = 0; x < 4; x++){
+d_predicted_output_sum[0][0] += d_predicted_output[x][0];
+		}
+		d_predicted_output_sum[0][0] *= lr;
+		output_bias[0][0] += d_predicted_output_sum[0][0];
+		
+		//13th step
+		R1 = 2;
+		C2 = 2;
+		R2 = 4;
+		for (int x = 0; x < R1; x++) {
+        		for (int j = 0; j < C2; j++) {
+				inputs_t_dot[x][j] = 0;
+				for (int k = 0; k < R2; k++) {
+					hlo = inputs_t[x][k];
+					ow = d_hidden_layer[k][j];
+inputs_t_dot[x][j] += hlo * ow; //Indent
+				}
+			}
+		}
+		for(int x = 0; x < 2; x++){
+			for(int j = 0; j < 2; j++){
+				inputs_t_dot[x][j] *= lr;
+			}
+		}
+		for(int x = 0; x < 2; x++){
+			for(int j = 0; j < 2; j++){
+				hidden_weights[x][j] += inputs_t_dot[x][j];
+			}
+		}
+
+		//14th step
+		for(int x = 0; x < 4; x++){
+			for(int j = 0; j < 2; j++){
+d_hidden_layer_sum[0][j] += d_hidden_layer[x][j];
+			}
+		}
+		for(int x = 0; x < 2; x++){
+			d_hidden_layer_sum[0][x] *= lr;
+		}
+		for(int x = 0; x < 2; x++){
+			hidden_bias[0][x] += d_hidden_layer_sum[0][x];
+		}
+
+
 	}
-	    /*printf("[%d,%d]", output[i][0], output[i][1]);*/
+
+		
+		
+printf("[%lf,%lf,%lf,%lf]", predicted_output[0][0], predicted_output[0][1],
+			    predicted_output[0][2],
+			    predicted_output[0][3]);
     
     	//printf("\n");
 	//printf("%f", sigmoid(1));
