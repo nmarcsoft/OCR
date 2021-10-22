@@ -181,7 +181,7 @@ int getAround(SDL_Surface* image_surface, int x, int y, int value)
 	Uint32 pixel = get_pixel(image_surface, x, y);
 	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 	int test;
-	for (int i = 1; i < 10; i++)
+	for (int i = 1; i < 20; i++)
 	{
 		test = 0;
 		for (int j = 1; j < 90; j++)
@@ -199,7 +199,7 @@ int getAround(SDL_Surface* image_surface, int x, int y, int value)
 			break;
 		}
 		else {
-			if (i == 9)
+			if (i == 19)
 			{
 				toReturn = 1;
 			}
@@ -223,6 +223,7 @@ void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
 		put_pixel(to, k, j, pixel2);
 	   }
 	}
+	printf("image printed with x = %d, y = %d\n", x, y);
 	SDL_SaveBMP(to, "out.bmp");
 }
 
@@ -245,26 +246,27 @@ int main()
     int caseX = widthCase(image_surface, width, height)-20;
     int caseY = heightCase(image_surface, width, height)-20  ;
     int tmp = 0;
-    for (int y = 0; y < height; y++)
+    int endLine = 1;
+    for (int y = 0; y < height; y+=2)
     {
-	for (int x = 0; x < width; x++)
+	for (int x = 0; x < width; x+=2)
 	{
 	    if(getAround(image_surface, x, y, 765))
 	    {
 		copySurface(image_surface, case1, x, y, caseX, caseY);
 		x += caseX;
 		tmp += 1;
+		endLine += 1;
+	    	printf("endLine = %d, tmp = %d", endLine, tmp);
 	    }
-	    if (tmp == 1)
+	    if (endLine%10 ==  0)
 	    {
+		endLine = 1;
+		y += caseY*1.02;
 		break;
 	    }
 	}
-	if (tmp == 1)
-	{
-		break;
-	}
-    }
+ }
     update_surface(screen_surface, image_surface);
     //wait_for_keypressed();
     return 0;
