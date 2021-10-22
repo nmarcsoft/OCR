@@ -227,124 +227,22 @@ void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
 	SDL_SaveBMP(to, "out.bmp");
 }
 
-
-int doneAll()
-{
-    SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
-    image_surface = load_image("imagemodif2.jpg");
-    int width = image_surface->w;
-    screen_surface = display_image(image_surface);
-    int height = image_surface->h;
-    update_surface(screen_surface, image_surface);
-    wait_for_keypressed();
-    int array[height][width];
-
-    Uint8 r, g, b;
-    Uint32 pixel;
-    for (int y = 0; y < height; y++)
-	{
-	for (int x = 0; x < width; x++)
-	{
-		pixel = get_pixel(image_surface, x, y);
-		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-		if (r > 127)
-		{
-			// We have a white pixel
-			array[y][x] = 1;
-		}
-		else
-		{
-			// We have a black pixel
-			array[y][x] = 0;
-		}
-	}
-	}
-
-    ///////////////////////////
-    /// Find longest Horizontal line
-    // longestH -> count the max of matrix
-    // tmp      -> count max on a line
-    // indexH   -> line of the max line
-    int longestH = 0;
-    int indexH = 0;
-    int tmp;
-    for (int i = 0; i < height; i++)
-    {
-	tmp = 0;
-	for (int j = 0; j < width; j++)
-	{
-		if (array[i][j] == 0)
-		{
-		    // We have a black pixel
-		    tmp += 1;
-		}
-	}
-	if (tmp > longestH)
-	{
-	     longestH = tmp;
-	     indexH = i;
-	}
-    }
-    //////////////////////////////
-    /// Same for Vertical
-    int longestV = 0;
-    int indexV = 0;
-     
-    for (int i = 0; i < width; i++)
-    {
-	tmp = 0;
-	for (int j = 0; j < height; j++)
-	{
-	    if (array[j][i] == 0)
-	    {
-		tmp++;
-	    }
-	}
-	if (tmp > longestV)
-	{
-	    longestV = tmp;
-	    indexV = i;
-	}
-    }
-    printf("longest Horizontal %d\n", indexH);
-    printf("longest Vertical %d", indexV);
-
-
-////////////////////////////////////////
-///////////////////////////////////////
-//         PRINT MATRIX            ///
-//    //   ///////////        //  ///
-/////////////////////////////////////
-/////////////////////////////////////
-//                                 //
-////                            ////
-///////                     ///////
-//////////////////////////////////
-    /*
-    for (int i = 0; i < height; i++)
-	{
-	for (int j = 0; j < height; j++)
-	{
-		printf("%d ", array[i][j]);
-	}
-	printf("\n");
-	}*/
-    return 0;
-}
-
 int main()
 {
-    doneAll();
-   //SDL_Surface* case1;
+
+    SDL_Surface* image_surface;
+    SDL_Surface* screen_surface;
+    SDL_Surface* case1;
     init_sdl();
 
-    //case1 = load_image("index.jpg");
+    image_surface = load_image("imagemodif2.bmp");
+    case1 = load_image("index.jpg");
+    screen_surface = display_image(image_surface);
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
-
-    /*
+    int width = image_surface->w;
+    int height = image_surface->h;
     int caseX = widthCase(image_surface, width, height)-20;
     int caseY = heightCase(image_surface, width, height)-20  ;
     int tmp = 0;
@@ -369,7 +267,7 @@ int main()
 	    }
 	}
  }
- */
+    update_surface(screen_surface, image_surface);
     //wait_for_keypressed();
     return 0;
 }
