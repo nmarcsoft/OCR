@@ -95,7 +95,12 @@ double initialize(){
 		{0},
 		{0}
 	};
+	
 
+	double hidden_layer_output_t[2][4] = {
+		{0,0,0,0},
+		{0,0,0,0}
+	};
 	
 	double hlo;//hidden_layer_output
 	double ow;//output_weight
@@ -128,12 +133,28 @@ double initialize(){
 		{0}
 	};
 
+	double sigmod_hlo[4][2] = {
+		{0,0},
+		{0,0},
+		{0,0},
+		{0,0}
+	};
+
+
 	double error_hidden_layer[4][2] = {
 		{0,0},
 		{0,0},
 		{0,0},
 		{0,0}
 	};
+	double d_hidden_layer[4][2] = {
+		{0,0},
+		{0,0},
+		{0,0},
+		{0,0}
+	};
+
+
 	double output_weights_t[1][2] = {
 		{0,0}
 	};
@@ -209,14 +230,33 @@ sigmod_predicted_output[x][0] = sigmoid_derivative(predicted_output[x][0]);
 		for(int x = 0; x < 4; x++){
 d_predicted_output[x][0] = error[x][0] * sigmod_predicted_output[x][0];
 		}
+
 		//9th step
 		for(int x = 0; x < 2; x++){
 			output_weights_t[0][x] = output_weights[x][0];
 		}
-		//The problem start here
 		for(int x = 0; x < 2; x++){
 			for(int j = 0; j < 4; j++){
-error_hidden_layer[x][j] = output_weights_t[0][x] * d_predicted_output[j][0];
+error_hidden_layer[j][x] = output_weights_t[0][x] * d_predicted_output[j][0];
+			}
+		}
+
+		//10th step
+		for(int x = 0; x < 4; x++){
+			for(int j = 0; j < 2; j++){
+sigmod_hlo[x][j] = sigmoid_derivative(hidden_layer_output[x][j]);
+			}
+		}
+		for(int x = 0; x < 4; x++){
+			for(int j = 0; j < 2; j++){
+d_hidden_layer[x][j] = error_hidden_layer[x][j] * sigmod_hlo[x][j];
+			}
+		}
+
+		//11th step
+		for(int x = 0; x < 4; x++){
+			for(int j = 0; j < 2; j++){
+hidden_layer_output_t[j][x] = hidden_layer_output[x][j];
 			}
 		}
 	}
