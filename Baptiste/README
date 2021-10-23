@@ -1,0 +1,50 @@
+
+int main()
+{
+
+    SDL_Surface* image_surface;
+    SDL_Surface* screen_surface;
+    init_sdl();
+
+
+    image_surface = load_image("images/image_01.jpeg");
+
+
+
+    screen_surface = display_image(image_surface);
+    int width = image_surface->w;
+    int height = image_surface->h;
+    int midtot;
+    int mid = 0;
+    //average image color calcul
+    for(int x = 0; x < width; x++)
+    {
+ 	for(int y = 0; y < height;y++)
+ 	{
+ 	      Uint32 pixel = get_pixel(image_surface, x, y);
+ 	      Uint8 r, g, b;
+ 	      SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
+ 	      mid = 0.3*r + 0.59*g + 0.11*b;
+ 	      midtot += mid;
+
+ 	      Uint32 pixel2 = SDL_MapRGB(image_surface->format, mid, mid, mid);
+ 	      put_pixel(image_surface, x, y, pixel2);
+ 	}
+    }
+    float threshold = midtot/(width*height);
+    for (int i = 0; i < width; i++)
+    {
+      for (int j = 0; j < height; j++)
+      {
+	Uint32 pixel = get_pixel(image_surface, i, j);
+	Uint8 r, g, b;
+	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+	Uint8 t = (r + g + b)/3;
+	if(t>threshold)
+	{
+	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 255, 255);
+	   put_pixel(image_surface, i, j, pixel2);
+	}
+	else
+	{
+	   Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
