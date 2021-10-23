@@ -1,90 +1,14 @@
-pixel_operations.o: pixel_operations.c \
- /run/current-system/sw/include/stdc-predef.h \
- /run/current-system/sw/include/err.h \
- /run/current-system/sw/include/features.h \
- /run/current-system/sw/include/sys/cdefs.h \
- /run/current-system/sw/include/bits/wordsize.h \
- /run/current-system/sw/include/bits/long-double.h \
- /run/current-system/sw/include/gnu/stubs.h \
- /run/current-system/sw/include/gnu/stubs-64.h \
- /run/current-system/sw/include/bits/floatn.h \
- /run/current-system/sw/include/bits/floatn-common.h pixel_operations.h \
- /run/current-system/sw/include/stdlib.h \
- /run/current-system/sw/include/bits/libc-header-start.h \
- /run/current-system/sw/include/bits/waitflags.h \
- /run/current-system/sw/include/bits/waitstatus.h \
- /run/current-system/sw/include/bits/types/locale_t.h \
- /run/current-system/sw/include/bits/types/__locale_t.h \
- /run/current-system/sw/include/sys/types.h \
- /run/current-system/sw/include/bits/types.h \
- /run/current-system/sw/include/bits/timesize.h \
- /run/current-system/sw/include/bits/typesizes.h \
- /run/current-system/sw/include/bits/time64.h \
- /run/current-system/sw/include/bits/types/clock_t.h \
- /run/current-system/sw/include/bits/types/clockid_t.h \
- /run/current-system/sw/include/bits/types/time_t.h \
- /run/current-system/sw/include/bits/types/timer_t.h \
- /run/current-system/sw/include/bits/stdint-intn.h \
- /run/current-system/sw/include/endian.h \
- /run/current-system/sw/include/bits/endian.h \
- /run/current-system/sw/include/bits/endianness.h \
- /run/current-system/sw/include/bits/byteswap.h \
- /run/current-system/sw/include/bits/uintn-identity.h \
- /run/current-system/sw/include/sys/select.h \
- /run/current-system/sw/include/bits/select.h \
- /run/current-system/sw/include/bits/types/sigset_t.h \
- /run/current-system/sw/include/bits/types/__sigset_t.h \
- /run/current-system/sw/include/bits/types/struct_timeval.h \
- /run/current-system/sw/include/bits/types/struct_timespec.h \
- /run/current-system/sw/include/bits/pthreadtypes.h \
- /run/current-system/sw/include/bits/thread-shared-types.h \
- /run/current-system/sw/include/bits/pthreadtypes-arch.h \
- /run/current-system/sw/include/bits/struct_mutex.h \
- /run/current-system/sw/include/bits/struct_rwlock.h \
- /run/current-system/sw/include/alloca.h \
- /run/current-system/sw/include/bits/stdlib-bsearch.h \
- /run/current-system/sw/include/bits/stdlib-float.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_main.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_stdinc.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_config.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_platform.h \
- /run/current-system/sw/include/stdio.h \
- /run/current-system/sw/include/bits/types/__fpos_t.h \
- /run/current-system/sw/include/bits/types/__mbstate_t.h \
- /run/current-system/sw/include/bits/types/__fpos64_t.h \
- /run/current-system/sw/include/bits/types/__FILE.h \
- /run/current-system/sw/include/bits/types/FILE.h \
- /run/current-system/sw/include/bits/types/struct_FILE.h \
- /run/current-system/sw/include/bits/types/cookie_io_functions_t.h \
- /run/current-system/sw/include/bits/stdio_lim.h \
- /run/current-system/sw/include/bits/stdio.h \
- /run/current-system/sw/include/string.h \
- /run/current-system/sw/include/strings.h \
- /run/current-system/sw/include/inttypes.h \
- /run/current-system/sw/include/stdint.h \
- /run/current-system/sw/include/bits/wchar.h \
- /run/current-system/sw/include/bits/stdint-uintn.h \
- /run/current-system/sw/include/ctype.h \
- /run/current-system/sw/include/iconv.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/begin_code.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/close_code.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_audio.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_error.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_endian.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_mutex.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_thread.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_rwops.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_cdrom.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_cpuinfo.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_events.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_active.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_keyboard.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_keysym.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_mouse.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_video.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_joystick.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_quit.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_loadso.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_timer.h \
- /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL_version.h
+pixel_operations.o: pixel_operations.c pixel_operations.h \
+ /usr/include/SDL/SDL.h /usr/include/SDL/SDL_main.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h /usr/include/SDL/SDL_audio.h \
+ /usr/include/SDL/SDL_error.h /usr/include/SDL/SDL_endian.h \
+ /usr/include/SDL/SDL_mutex.h /usr/include/SDL/SDL_thread.h \
+ /usr/include/SDL/SDL_rwops.h /usr/include/SDL/SDL_cdrom.h \
+ /usr/include/SDL/SDL_cpuinfo.h /usr/include/SDL/SDL_events.h \
+ /usr/include/SDL/SDL_active.h /usr/include/SDL/SDL_keyboard.h \
+ /usr/include/SDL/SDL_keysym.h /usr/include/SDL/SDL_mouse.h \
+ /usr/include/SDL/SDL_video.h /usr/include/SDL/SDL_joystick.h \
+ /usr/include/SDL/SDL_quit.h /usr/include/SDL/SDL_loadso.h \
+ /usr/include/SDL/SDL_timer.h /usr/include/SDL/SDL_version.h
