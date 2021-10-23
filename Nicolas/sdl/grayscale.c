@@ -231,17 +231,16 @@ void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
 int doneAll()
 {
     SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
-    image_surface = load_image("imagemodif2.jpg");
+    //SDL_Surface* screen_surface;
+    image_surface = load_image("imagemodif2.bmp");
     int width = image_surface->w;
-    screen_surface = display_image(image_surface);
+    //screen_surface = display_image(image_surface);
     int height = image_surface->h;
-    update_surface(screen_surface, image_surface);
-    wait_for_keypressed();
+    //update_surface(screen_surface, image_surface);
     int array[height][width];
-
     Uint8 r, g, b;
     Uint32 pixel;
+    printf("Go for the first one\n");
     for (int y = 0; y < height; y++)
 	{
 	for (int x = 0; x < width; x++)
@@ -260,15 +259,16 @@ int doneAll()
 		}
 	}
 	}
+	printf("First Done\n");
 
     ///////////////////////////
     /// Find longest Horizontal line
     // longestH -> count the max of matrix
     // tmp      -> count max on a line
     // indexH   -> line of the max line
-    int longestH = 0;
-    int indexH = 0;
+    int indexH[9];
     int tmp;
+    int added = 0;
     for (int i = 0; i < height; i++)
     {
 	tmp = 0;
@@ -280,17 +280,17 @@ int doneAll()
 		    tmp += 1;
 		}
 	}
-	if (tmp > longestH)
+	if (tmp > height / 2)
 	{
-	     longestH = tmp;
-	     indexH = i;
+	     indexH[added] = i;
+	     added++;
+	     i += height * 0.015;
 	}
     }
     //////////////////////////////
     /// Same for Vertical
-    int longestV = 0;
-    int indexV = 0;
-     
+    int indexV[9];
+    added = 0; 
     for (int i = 0; i < width; i++)
     {
 	tmp = 0;
@@ -301,16 +301,51 @@ int doneAll()
 		tmp++;
 	    }
 	}
-	if (tmp > longestV)
+	if (tmp > width / 2)
 	{
-	    longestV = tmp;
-	    indexV = i;
+	    indexV[added] = i;
+	    added++;
+	    i += width * 0.015; 
 	}
     }
-    printf("longest Horizontal %d\n", indexH);
-    printf("longest Vertical %d", indexV);
 
-
+    // We have the coordonate of the long lines,
+    // now lets try to get the case
+    int toPrint[array[0][0] - array[1][0]][array[0][0] - array[0][1]];
+    added = 0;
+    tmp = 0;
+    for (int y = indexV[added]; y < height; y++)
+    {
+	for (int x = indexH[added]; x < width; x++)
+	{
+	   if (array[x][y] && added<= 8)
+	  {
+		for (int i = y; i < indexV[added +1]; i++)
+		{
+			for (int j = x; j < indexH[added + 1]; j++)
+			{
+		    toPrint[i][j] = array[x + i][y + j];
+			}
+		}
+		added++;
+		if (added < 9)
+		{
+		tmp++;
+		y = indexV[added];
+		x = indexH[added];
+		}
+	   }
+	   if (tmp)
+	   {
+		break;
+	   }
+	}
+	if (tmp)
+	{
+		break;
+	}
+    }
+    printf("test");
 ////////////////////////////////////////
 ///////////////////////////////////////
 //         PRINT MATRIX            ///
@@ -318,26 +353,25 @@ int doneAll()
 /////////////////////////////////////
 /////////////////////////////////////
 //                                 //
-////                            ////
+////          Index qui depasse sur code superieur                  ////
 ///////                     ///////
 //////////////////////////////////
-    /*
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < height/10; i++)
 	{
-	for (int j = 0; j < height; j++)
+	for (int j = 0; j < width/10; j++)
 	{
-		printf("%d ", array[i][j]);
+		printf(" x = %d, y = %d -> %d\n",j, i, toPrint[i][j]);
+
 	}
-	printf("\n");
-	}*/
-    return 0;
-}
+	}
+	return 0;
+	}
 
 int main()
 {
+    init_sdl();
     doneAll();
    //SDL_Surface* case1;
-    init_sdl();
 
     //case1 = load_image("index.jpg");
     // VARIABLES :
