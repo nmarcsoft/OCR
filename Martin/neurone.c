@@ -43,43 +43,43 @@ double initialize(){
 	//RANDOM GENERATION OF WEIGHT
 	//
 	//CAUTION WEIGHTS IS AlWAYS THE SAME FOR THE MOMENT
-	/*
+	
     double w1 = grd();
     double w2 = grd();
 	double w3 = grd();
 	double w4 = grd();
-	*/
-    double w1 = 0.53693547;
-    double w2 = 0.65395706;
-    double w3 = 0.79303014;
-    double w4 = 0.41798478;
+	
+    //double w1 = 0.53693547;
+    //double w2 = 0.65395706;
+    //double w3 = 0.79303014;
+    //double w4 = 0.41798478;
 	double hidden_weights[2][2] = {
 		{w1,w2},
 		{w3,w4}
 	};
-	/*
+	
 	double w5 = grd();
 	double w6 = grd();
-    */
-    double w5 = 0.90264962;
-    double w6 = 0.27819198;
+    
+    //double w5 = 0.90264962;
+    //double w6 = 0.27819198;
 	double hidden_bias[1][2] = {
 		{w5,w6}
 	};
 	
-    /*
+    
 	double w7 = grd();
 	double w8 = grd();
-    */
-    double w7 = 0.38364596;
-    double w8 = 0.08348636;
+    
+    //double w7 = 0.38364596;
+    //double w8 = 0.08348636;
 	double output_weights[2][1] = {
 		{w7},
 		{w8}
 	};
 	
-	//double w9 = grd();
-	double w9 = 0.46104674;    
+	double w9 = grd();
+	//double w9 = 0.46104674;    
     double output_bias[1][1] = {
 		{w9}
 	};
