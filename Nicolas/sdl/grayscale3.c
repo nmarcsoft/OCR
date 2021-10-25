@@ -227,22 +227,168 @@ void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
 	SDL_SaveBMP(to, "out.bmp");
 }
 
+
+int doneAll()
+{
+    SDL_Surface* image_surface;
+    //SDL_Surface* screen_surface;
+    image_surface = load_image("imagemodif2.bmp");
+    int width = image_surface->w;
+    //screen_surface = display_image(image_surface);
+    int height = image_surface->h;
+    //update_surface(screen_surface, image_surface);
+    int array[height][width];
+    Uint8 r, g, b;
+    Uint32 pixel;
+    printf("Go for the first one\n");
+    for (int y = 0; y < height; y++)
+	{
+	for (int x = 0; x < width; x++)
+	{
+		pixel = get_pixel(image_surface, x, y);
+		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+		if (r > 127)
+		{
+			// We have a white pixel
+			array[x][y] = 1;
+		}
+		else
+		{
+			// We have a black pixel
+			array[x][y] = 0;
+		}
+	}
+	}
+	printf("First Done\n");
+
+    ///////////////////////////
+    /// Find longest Horizontal line
+    // longestH -> count the max of matrix
+    // tmp      -> count max on a line
+    // indexH   -> line of the max line
+    int indexH[10];
+    int tmp;
+    int added = 0;
+    for (int i = 0; i < height; i++)
+    {
+	tmp = 0;
+	for (int j = 0; j < width; j++)
+	{
+		if (array[i][j] == 0)
+		{
+		    // We have a black pixel
+		    tmp += 1;
+		}
+	}
+	if (tmp > height / 2)
+	{
+	     indexH[added] = i;
+	     added++;
+	     i += height * 0.015;
+	}
+    }
+    //////////////////////////////
+    /// Same for Vertical
+    int indexV[10];
+    added = 0; 
+    for (int i = 0; i < width; i++)
+    {
+	tmp = 0;
+	for (int j = 0; j < height; j++)
+	{
+	    if (array[i][j] == 0)
+	    {
+		tmp++;
+	    }
+	}
+	if (tmp > width / 2)
+	{
+	    indexV[added] = i;
+	    added++;
+	    i += width * 0.015; 
+	}
+    }
+
+    // We have the coordonate of the long lines,
+    // now lets try to get the case
+    int toPrint[indexV[1]][indexH[1]];
+    tmp = 0;
+    int gap = 0;
+    printf("IndexV 0 -> %d | indexV 1 -> %d", indexV[0], indexV[1]);
+    for (int y = indexH[gap]; y < height; y++)
+    {
+	for (int x = indexV[gap]; x < width; x++)
+	{
+	   if (array[y][x] && gap<= 8)
+	  {
+	  	//printf("x = %d y = %d gap = %d\n", x, y, gap);
+		int toPrint[indexV[1]][indexH[1]];
+		for (int i = y; i < indexH[1]; i++)
+		{
+			for (int j = x; j < indexV[gap+1] - 2; j++)
+			{
+				if (array[j][i] == 0){
+		printf("x = %d y = %d, array = %d\n", j, i, array[i][j]);
+		toPrint[j][i] = array[y + i][x + j];}
+			}
+		}
+		tmp++;
+		gap++;
+		x = indexV[gap];
+
+		/*if (added < 9)
+		{
+	
+		printf("implementation");
+		y = indexV[added];
+		x = indexH[added];
+		}*/
+	   }
+	   if (tmp == 2)
+	   {
+		break;
+	   }
+	}
+	if (tmp == 2)
+	{
+		break;
+	}
+    }
+    printf("test");;
+////////////////////////////////////////
+///////////////////////////////////////
+//         PRINT MATRIX            ///
+//    //   ///////////        //  ///
+/////////////////////////////////////
+/////////////////////////////////////
+//                                 //
+////          Index qui depasse sur code superieur                  ////
+///////                     ///////
+//////////////////////////////////
+	/*printf("added = %d\nindexV[added + 1] = %d and indexH[added + 1] = %d", added, indexV[added + 1], indexH[added + 1]);
+    for (int i = 0; i < indexH[1] - lineStartX; i++)
+	{
+	for (int j = 0; j < indexV[1] - lineStartX; j++)
+	{
+		if (toPrint[i][j]){
+		printf(" x = %d, y = %d -> %d\n",lineStartX + j, lineStartX + i, toPrint[i][j]);}
+	}
+	}*/
+	return 0;
+	}
+
 int main()
 {
-
-    SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
-    SDL_Surface* case1;
     init_sdl();
+    doneAll();
+   //SDL_Surface* case1;
 
-    image_surface = load_image("imagemodif2.bmp");
-    case1 = load_image("index.jpg");
-    screen_surface = display_image(image_surface);
+    //case1 = load_image("index.jpg");
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
-    int width = image_surface->w;
-    int height = image_surface->h;
+
+    /*
     int caseX = widthCase(image_surface, width, height)-20;
     int caseY = heightCase(image_surface, width, height)-20  ;
     int tmp = 0;
@@ -267,7 +413,7 @@ int main()
 	    }
 	}
  }
-    update_surface(screen_surface, image_surface);
+ */
     //wait_for_keypressed();
     return 0;
 }
