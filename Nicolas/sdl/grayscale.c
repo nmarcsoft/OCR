@@ -266,7 +266,7 @@ int doneAll()
     // longestH -> count the max of matrix
     // tmp      -> count max on a line
     // indexH   -> line of the max line
-    int indexH[9];
+    int indexH[10];
     int tmp;
     int added = 0;
     for (int i = 0; i < height; i++)
@@ -289,7 +289,7 @@ int doneAll()
     }
     //////////////////////////////
     /// Same for Vertical
-    int indexV[9];
+    int indexV[10];
     added = 0; 
     for (int i = 0; i < width; i++)
     {
@@ -311,41 +311,52 @@ int doneAll()
 
     // We have the coordonate of the long lines,
     // now lets try to get the case
-    int toPrint[array[0][0] - array[1][0]][array[0][0] - array[0][1]];
-    added = 0;
+    int toPrint[indexV[1]][indexH[1]];
     tmp = 0;
-    for (int y = indexV[added]; y < height; y++)
+    int gap = 0;
+    int gapX = 0;
+    int gapY = 0;
+    printf("indexV[0] = %d", indexV[0]);
+    printf("indexH %d\n", indexH[0]);
+    for (int y = gapY; y < height; y++)
     {
-	for (int x = indexH[added]; x < width; x++)
+	for (int x = gapX; x < width; x++)
 	{
-	   if (array[x][y] && added<= 8)
+	   if (array[x][y] && gap<= 8)
 	  {
-		for (int i = y; i < indexV[added +1]; i++)
+	  	//printf("x = %d y = %d gap = %d\n", x, y, gap);
+		int toPrint[indexV[gap + 1]][indexH[gap + 1]];
+		for (int i = 0; i < indexV[gap+1] - indexV[gap] -1; i++)
 		{
-			for (int j = x; j < indexH[added + 1]; j++)
-			{
-		    toPrint[i][j] = array[x + i][y + j];
+			for (int j = 0; j < indexH[gap+1] - indexH[gap] - 2; j++)
+			{	
+		printf("x = %d y = %d, array = %d\n", j, i, array[x + j][y + i]);
+		toPrint[i][j] = array[y + i][x + j];
 			}
 		}
-		added++;
-		if (added < 9)
-		{
 		tmp++;
+		gap++;
+		gapX = indexH[gap];
+		gapY = indexV[gap];
+		/*if (added < 9)
+		{
+	
+		printf("implementation");
 		y = indexV[added];
 		x = indexH[added];
-		}
+		}*/
 	   }
-	   if (tmp)
+	   if (tmp == 3)
 	   {
 		break;
 	   }
 	}
-	if (tmp)
+	if (tmp == 3)
 	{
 		break;
 	}
     }
-    printf("test");
+    printf("test");;
 ////////////////////////////////////////
 ///////////////////////////////////////
 //         PRINT MATRIX            ///
@@ -356,14 +367,15 @@ int doneAll()
 ////          Index qui depasse sur code superieur                  ////
 ///////                     ///////
 //////////////////////////////////
-    for (int i = 0; i < height/10; i++)
+	/*printf("added = %d\nindexV[added + 1] = %d and indexH[added + 1] = %d", added, indexV[added + 1], indexH[added + 1]);
+    for (int i = 0; i < indexH[1] - lineStartX; i++)
 	{
-	for (int j = 0; j < width/10; j++)
+	for (int j = 0; j < indexV[1] - lineStartX; j++)
 	{
-		printf(" x = %d, y = %d -> %d\n",j, i, toPrint[i][j]);
-
+		if (toPrint[i][j]){
+		printf(" x = %d, y = %d -> %d\n",lineStartX + j, lineStartX + i, toPrint[i][j]);}
 	}
-	}
+	}*/
 	return 0;
 	}
 
