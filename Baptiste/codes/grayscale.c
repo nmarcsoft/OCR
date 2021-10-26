@@ -79,21 +79,26 @@ int main()
     SDL_Surface* image_surface;
     SDL_Surface* screen_surface;
     init_sdl();
-    image_surface = load_image("images/image_02.jpeg");
+    image_surface = load_image("images/image_01.jpeg");
     screen_surface = display_image(image_surface);
 
     int width = image_surface->w;
     int height = image_surface->h;
-    float zoom = 1.0;
+    float zoom;
+    float w = image_surface->w; 
+    float h = image_surface->h; 
+    printf("h%f  ",h); 
+    
+    printf("w%f  ",w);
     if(height > width)
     {
-	zoom = 1000/height;
-	printf("%f   ",zoom);
+	zoom = 1000/h;
+	printf("h%f  ",zoom);
     }
     else
     {
-	zoom = 1000/width;
-	printf("%f   ",zoom);
+	zoom = 1000/w;
+	printf("w%f  ",zoom);
     }
     float mid = 0;
     long double min_gray = 255;
@@ -149,19 +154,22 @@ x--;
 
 
     float k = 0.5;
-    // calcul de R = o max
+    // calculation R = o max
 
     float T = 0;
     int tottemp = 0;
     int moytemp = 0;
     float var = 0;
     float maxvar = 0;
+    int bordw = 0;
 
 
-	
-for (int tempw = 0; tempw<(width-25); tempw+=25)
+for (int tempw = 0; tempw < width; tempw+=25)
 {
-	for(int temph = 0; temph<(height-25); temph+=25)
+	if(tempw>width)
+	{	bordw = width%25;
+		tempw -= bordw;}
+	for(int temph = 0; temph<=height-25; temph+=25)
 	{
 		for(int x = tempw ;x<tempw+25;x++)
 		{
@@ -169,7 +177,8 @@ for (int tempw = 0; tempw<(width-25); tempw+=25)
 			{
 				Uint32 pixel = get_pixel(image_surface, x, y);
         	        	Uint8 r, g, b;
-	                	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+	                	SDL_GetRGB(pixel, image_surface->format, 
+						&r, &g, &b);
         		        tottemp += r;
 				var += (r-moytemp)*(r-moytemp);
         			
@@ -181,22 +190,26 @@ for (int tempw = 0; tempw<(width-25); tempw+=25)
 		{
 			maxvar = var;
 		}
-		T = (1-k)*moytemp + k*min_gray + k* (var/(maxvar*(moytemp-min_gray)));
+		T = (1-k)*moytemp + k*min_gray + k* (var/(maxvar*
+					(moytemp-min_gray)))+30;
 		for(int x = tempw ;x<tempw+25;x++)
                 {
                         for(int y = temph; y<temph+25;y++)
                         {
                                 Uint32 pixel = get_pixel(image_surface, x, y);
                                 Uint8 r, g, b;
-                                SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+                                SDL_GetRGB(pixel, image_surface->format, 
+						&r, &g, &b);
                      		if (r < T)
                 		{
-					Uint32 pixel2 = SDL_MapRGB(image_surface->format, 0, 0, 0);
+					Uint32 pixel2 = SDL_MapRGB
+					(image_surface->format, 0, 0, 0);
   					put_pixel(image_surface, x, y, pixel2);
 				}
         		        else
                			{
-					Uint32 pixel2 = SDL_MapRGB(image_surface->format, 255, 255, 255);
+					Uint32 pixel2 = SDL_MapRGB
+					(image_surface->format, 255, 255, 255);
 					put_pixel(image_surface, x, y, pixel2);
                 		}
 			}
@@ -214,6 +227,7 @@ for (int tempw = 0; tempw<(width-25); tempw+=25)
     SDL_Rect rect;
     double angle = 0;
     SDL_Init(SDL_INIT_VIDEO);
+    int angletorotate =0;
 
     SDL_WM_SetCaption("Rotations du Sudoku", NULL);
 
@@ -230,39 +244,40 @@ for (int tempw = 0; tempw<(width-25); tempw+=25)
             break;
         }
 
- //On augmente l'angle pour que l'image tourne sur elle-même.
-
 	SDL_FillRect(screen_surface, NULL, SDL_MapRGB
 	(screen_surface->format, 255, 255, 255));
-	rotation = rotozoomSurface(image_surface, angle, 1.0, 1); 
+	//rotation = rotozoomSurface(image_surface, angle, 1.0, 1); 
 	//On transforme la surface image.
 	rect.x = 0;
 	rect.y = 0;
-	printf("%f",zoom);
+	//we put the image at the top left
+	//I want to put it at the center.
 	rotation = rotozoomSurface(image_surface, angle, 0.5, 1);
-	//On transforme la surface image.
-        //On positionne l'image en fonction de sa taille.
         SDL_BlitSurface(rotation , NULL, screen_surface, &rect); 
-	//On affiche la rotation de la surface image.
+	//Display rotation
         SDL_FreeSurface(rotation);
-	//On efface rotation car on va la redéfinir dans la prochaine boucle. Si on ne le fait pas, cela crée une fuite de mémoire. 
-        
+	// We erase rotation because we are going 
+	// to redefine it in the next loop.
+	// to avoid a segmentation fault
 	SDL_Flip(screen_surface);
-	angle+=2;
+	angle+=1;
+	// We increase the angle so the image rotates on itself.
         SDL_Flip(screen_surface);
 	int a = getchar();
 	if (a == 97)
 	{
 		continuer = 0;
-		SDL_SaveBMP(rotation,"imagemodif3.bmp");
+		SDL_SaveBMP(rotozoomSurface(image_surface,angletorotate,zoom,1)
+				,"image3.bmp");
+	}
+	else
+	{
+		angletorotate += 1;
 	}
     }
 
 
 
-//Rotate function
-//https://openclassrooms.com/forum/sujet/nouvelles-dimensions-image-avec-sdl-gfx
-//SDL_Surface * zoomSurface ( SDL_Surface *src, double zoomx, double zoomy, int smooth);
 update_surface(screen_surface, image_surface);
 SDL_FreeSurface(image_surface);
 SDL_FreeSurface(screen_surface);
