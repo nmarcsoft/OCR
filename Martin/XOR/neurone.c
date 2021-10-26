@@ -36,9 +36,7 @@ double initialize(){
 
 	int epochs = 10000;
 	double lr = 0.1;
-	int inputLayersNeurons = 2;
-	int hiddenLayerNeurons = 2;
-	int outputLayerNeurons = 1;
+	
 	
 	//RANDOM GENERATION OF WEIGHT
 	//
@@ -92,10 +90,7 @@ double initialize(){
 		{0,0},
 		{0,0}
 	};
-	double hw00;
-	double hw01;
-	double hw10;
-	double hw11;
+	
 
 	double hidden_layer_output[4][2] = {
 		{0,0},
@@ -197,14 +192,6 @@ double initialize(){
 		{0,0}
 	};
 	
-	double ehl00;
-	double ehl01;
-	double ehl10;
-	double ehl11;
-	double ehl20;
-	double ehl21;
-	double ehl30;
-	double ehl31;
 
 	int R1;
 	int C2;
