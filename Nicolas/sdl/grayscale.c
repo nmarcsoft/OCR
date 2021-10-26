@@ -236,8 +236,8 @@ int main()
     init_sdl();
 
     image_surface = load_image("imagemodif2.bmp");
-    case1 = load_image("index.jpg");
-    screen_surface = display_image(image_surface);
+    case1 = load_image("out.bmp");
+    //screen_surface = display_image(image_surface);
     // VARIABLES :
     // cptHeight -> count lines vertical
     // cptWidth -> count lines horizontal
@@ -253,7 +253,7 @@ int main()
 	{
 	    if(getAround(image_surface, x, y, 765))
 	    {
-		copySurface(image_surface, case1, x, y, caseX, caseY);
+		copySurface(image_surface, case1, x+1, y+1, caseX, caseY);
 		x += caseX;
 		tmp += 1;
 		endLine += 1;
@@ -267,7 +267,7 @@ int main()
 	    }
 	}
  }
-    update_surface(screen_surface, image_surface);
+    //update_surface(screen_surface, image_surface);
     //wait_for_keypressed();
     return 0;
 }
