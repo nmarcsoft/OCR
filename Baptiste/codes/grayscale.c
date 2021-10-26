@@ -35,7 +35,9 @@ SDL_Surface* display_image(SDL_Surface *img)
     SDL_Surface *screen;
 
     // Set the window to the same size as the image
-    screen = SDL_SetVideoMode(1000, 1000, 32, SDL_HWSURFACE);
+
+    screen = SDL_SetVideoMode(img->w, img->h, 32, SDL_HWSURFACE);
+//    screen = SDL_SetVideoMode(1000, 1000, 32, SDL_SWSURFACE|SDL_ANYFORMAT);
     if (screen == NULL)
     {
         // error management
@@ -79,7 +81,7 @@ int main()
     SDL_Surface* image_surface;
     SDL_Surface* screen_surface;
     init_sdl();
-    image_surface = load_image("images/image_01.jpeg");
+    image_surface = load_image("images/image_05.jpeg");
     screen_surface = display_image(image_surface);
 
     int width = image_surface->w;
@@ -87,22 +89,24 @@ int main()
     float zoom;
     float w = image_surface->w; 
     float h = image_surface->h; 
-    printf("h%f  ",h); 
-    
-    printf("w%f  ",w);
+
+    SDL_FillRect(screen_surface, NULL, SDL_MapRGB
+    (screen_surface->format, 255, 255, 255));
+
+
     if(height > width)
     {
 	zoom = 1000/h;
-	printf("h%f  ",zoom);
     }
     else
     {
 	zoom = 1000/w;
-	printf("w%f  ",zoom);
     }
     float mid = 0;
     long double min_gray = 255;
     
+ 
+
     for(int x = 0; x < width; x++)
     {
        for(int y = 0; y < height;y++)
@@ -191,7 +195,7 @@ for (int tempw = 0; tempw < width; tempw+=25)
 			maxvar = var;
 		}
 		T = (1-k)*moytemp + k*min_gray + k* (var/(maxvar*
-					(moytemp-min_gray)))+30;
+					(moytemp-min_gray)));
 		for(int x = tempw ;x<tempw+25;x++)
                 {
                         for(int y = temph; y<temph+25;y++)
@@ -229,13 +233,25 @@ for (int tempw = 0; tempw < width; tempw+=25)
     SDL_Init(SDL_INIT_VIDEO);
     int angletorotate =0;
 
-    SDL_WM_SetCaption("Rotations du Sudoku", NULL);
+    SDL_WM_SetCaption("Type 'a' to save, anything to rotate", NULL);
 
     int continuer = 1;
 
 
-        while(continuer)
-	{
+    while(continuer)
+    {
+	int a = getchar(); 
+	if (a == 97)
+    	{
+		continuer = 0;
+		SDL_SaveBMP(rotozoomSurface(image_surface,angletorotate,zoom,1)
+			,"image3.bmp");
+    	break;
+	}
+    	else
+    	{
+		angletorotate += 1;
+	}
         SDL_PollEvent(&event);
         switch(event.type)
         {
@@ -252,7 +268,7 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	rect.y = 0;
 	//we put the image at the top left
 	//I want to put it at the center.
-	rotation = rotozoomSurface(image_surface, angle, 0.5, 1);
+	rotation = rotozoomSurface(image_surface, angle, zoom, 1);
         SDL_BlitSurface(rotation , NULL, screen_surface, &rect); 
 	//Display rotation
         SDL_FreeSurface(rotation);
@@ -263,18 +279,8 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	angle+=1;
 	// We increase the angle so the image rotates on itself.
         SDL_Flip(screen_surface);
-	int a = getchar();
-	if (a == 97)
-	{
-		continuer = 0;
-		SDL_SaveBMP(rotozoomSurface(image_surface,angletorotate,zoom,1)
-				,"image3.bmp");
-	}
-	else
-	{
-		angletorotate += 1;
-	}
-    }
+	screen_surface = SDL_SetVideoMode(1000, 1000,32, SDL_HWSURFACE);
+}
 
 
 
