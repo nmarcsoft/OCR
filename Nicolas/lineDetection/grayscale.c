@@ -231,7 +231,7 @@ int main()
 {
 
     SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
+    //SDL_Surface* screen_surface;
     SDL_Surface* case1;
     init_sdl();
 

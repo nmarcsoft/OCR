@@ -1,4 +1,4 @@
-display.o: display.c /run/current-system/sw/include/stdc-predef.h \
+grayscale.o: grayscale.c /run/current-system/sw/include/stdc-predef.h \
  /run/current-system/sw/include/err.h \
  /run/current-system/sw/include/features.h \
  /run/current-system/sw/include/sys/cdefs.h \
@@ -88,4 +88,5 @@ display.o: display.c /run/current-system/sw/include/stdc-predef.h \
  /run/current-system/sw/include/SDL/SDL_timer.h \
  /run/current-system/sw/include/SDL/SDL_version.h \
  /run/current-system/sw/include/SDL/SDL_image.h \
- /run/current-system/sw/include/SDL/SDL.h
+ /run/current-system/sw/include/SDL/SDL.h pixel_operations.h \
+ /nix/store/xlsziya381rra6hzbvw9nll33hmbdpil-SDL-1.2.15-dev/include/SDL/SDL.h

@@ -1,12 +1,7 @@
-#include <stdio.h>
 #include <err.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "pixel_operations.h"
-#include <SDL/SDL_rotozoom.h>
-#include <math.h>
-
-#define TEMPS       30 
 
 void init_sdl()
 {
@@ -35,9 +30,7 @@ SDL_Surface* display_image(SDL_Surface *img)
     SDL_Surface *screen;
 
     // Set the window to the same size as the image
-
-    screen = SDL_SetVideoMode(img->w, img->h, 32, SDL_HWSURFACE);
-//    screen = SDL_SetVideoMode(1000, 1000, 32, SDL_SWSURFACE|SDL_ANYFORMAT);
+    screen = SDL_SetVideoMode(img->w, img->h, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
     if (screen == NULL)
     {
         // error management
@@ -73,221 +66,209 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
+int widthCase(SDL_Surface* image_surface, int width, int height)
+{
+    int toReturn = 0;
+    int test;
+for (int i = 0; i < height; i++)
+    {
+	for (int j = 0; j < width; j++)
+	{
+		Uint32 pixel = get_pixel(image_surface, j, i);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+		// Check if the pixel is black
+		if (r == 0)
+		{
+			
+			// We have a black pixel
+			// CPT : Count number of white pixels,
+			// if > 980 -> black line detected
+			int cpt = 0;
+			test = 1;
+			while (j < width-1 && test)
+			{
+			j++;
+			Uint32 pixel = get_pixel(image_surface, j, i);
+			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
+			if (r == 0)
+			{
+			// Create a red pixel
+			cpt += 1;
+			}
+			else
+			{
+				test = 0;
+			}
+			}
+			// Test if we have many black pixels -> it's a lin
+			if (cpt > width-20)
+			{
+				i += width/90;
+				toReturn = cpt/9;
+				
+				break;
+			}
+		}
+	}
+	if (test)
+	{
+		break;
+	}
+    }
+	return toReturn;
+}
+
+int heightCase(SDL_Surface* image_surface, int width, int height)
+{
+int test = 0;
+int caseY = 0;
+	for (int i = 0; i < width; i++)
+    {
+	for (int j = 0; j < height; j++)
+	{
+		Uint32 pixel = get_pixel(image_surface, i, j);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+		// Check if the pixel is black
+		if (r == 0)
+		{
+			
+			// We have a black pixel
+			// CPT : Count number of white pixels,
+			// if > 200 -> black line detected
+			int cpt = 0;
+			test = 1;
+			while (j < height-1 && test)
+			{
+			j++;
+			Uint32 pixel = get_pixel(image_surface, i, j);
+			SDL_GetRGB(pixel,image_surface->format,&r,&g,&b);
+			if (r == 0)
+			{
+			// Put the pixel in the image
+			cpt += 1;
+			}
+			else
+			{
+				test = 0;
+			}
+			}
+			// Test if we have many black pixels -> it's a line
+			if (cpt > height-20)
+			{
+				i += height/90;
+				caseY = cpt/9;
+				break;
+			}
+		}
+	}
+    }
+	return caseY;
+ 
+}
 
 
-int main() 
+// FUNCTION that check if on the 5 next pixel, from top to bot, we
+// have the same color of pixel
+//
+// To check black -----> value = 0
+// To check white -----> value = 765
+int getAround(SDL_Surface* image_surface, int x, int y, int value)
+{
+	Uint8 r, g, b;
+	int toReturn = 0;
+	Uint32 pixel = get_pixel(image_surface, x, y);
+	SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+	int test;
+	for (int i = 1; i < 20; i++)
+	{
+		test = 0;
+		for (int j = 1; j < 90; j++)
+		{
+			Uint32 pixel = get_pixel(image_surface, x+j, y+i);
+			SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+			if (r + g + b != value)
+			{
+				break;
+			}
+			test+=1;
+		}
+		if (test != 89)
+		{
+			break;
+		}
+		else {
+			if (i == 19)
+			{
+				toReturn = 1;
+			}
+		}
+	}
+	return toReturn;
+}
+
+// Put caseX*caseY pixel from (x, y) in "from" -> to "to"
+void copySurface(SDL_Surface* from, SDL_Surface* to, int x, int y,
+		int caseX, int caseY)
+{
+	for (int j = 0; j < caseY; j++)
+	{
+	   for (int k = 0; k < caseX; k++)
+	   {
+		Uint32 pixel = get_pixel(from, x+k, y+j);
+		Uint8 r, g, b;
+		SDL_GetRGB(pixel, from->format,&r, &g, &b);
+	   	Uint32 pixel2 = SDL_MapRGB(to->format, r, g, b);
+		put_pixel(to, k, j, pixel2);
+	   }
+	}
+	printf("image printed with x = %d, y = %d\n", x, y);
+	SDL_SaveBMP(to, "out2.bmp");
+}
+
+int main()
 {
 
     SDL_Surface* image_surface;
-    SDL_Surface* screen_surface;
+    //SDL_Surface* screen_surface;
+    SDL_Surface* case1;
     init_sdl();
-    image_surface = load_image("images/image_05.jpeg");
-    screen_surface = display_image(image_surface);
 
+    image_surface = load_image("image3.bmp");
+    case1 = load_image("out1.bmp");
+    //screen_surface = display_image(image_surface);
+    // VARIABLES :
+    // cptHeight -> count lines vertical
+    // cptWidth -> count lines horizontal
     int width = image_surface->w;
     int height = image_surface->h;
-    float zoom;
-    float w = image_surface->w; 
-    float h = image_surface->h; 
-
-    SDL_FillRect(screen_surface, NULL, SDL_MapRGB
-    (screen_surface->format, 255, 255, 255));
-
-
-    if(height > width)
+    int caseX = widthCase(image_surface, width, height)-20;
+    int caseY = heightCase(image_surface, width, height)-20  ;
+    int tmp = 0;
+    int endLine = 1;
+    for (int y = 0; y < height; y+=2)
     {
-	zoom = 1000/h;
-    }
-    else
-    {
-	zoom = 1000/w;
-    }
-    float mid = 0;
-    long double min_gray = 255;
-    
- 
-
-    for(int x = 0; x < width; x++)
-    {
-       for(int y = 0; y < height;y++)
-       {
-         Uint32 pixel = get_pixel(image_surface, x, y);
-         Uint8 r, g, b;
-         SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
-         mid = 0.3*r + 0.59*g + 0.11*b;
-	 if (mid<min_gray)
-	 {
-		 min_gray = mid;
-	 }
-         Uint32 pixel2 = SDL_MapRGB(image_surface->format, mid, mid, mid);
-         put_pixel(image_surface, x, y, pixel2);
-       }
-    }
-update_surface(screen_surface,image_surface);
-wait_for_keypressed();
-
-/*int i =0;
-int j = 0;
-int r = 0;
-int x= 0;
-for (; i < height; i++)
-    {
-      for (; j < width; j++)
-      {
-        Uint32 pixel = get_pixel(image_surface, j, i);
-        Uint8 r, g, b;
-        SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-        if(r==0)
-        {break;}
-      }
-      if(r==0)
-      { x=i;
-	      break;}
-    }
-
-while(angletorotate == 0 && x>0) 
-{
-Uint32 pixel2 = get_pixel(image_surface, x, j+20);
-Uint8 r2, g2, b2;
-SDL_GetRGB(pixel2, image_surface->format, &r2, &g2, &b2);
-
-angletorotate = (j+20)/(i-x);
-
-x--;
-}*/
-
-
-    float k = 0.5;
-    // calculation R = o max
-
-    float T = 0;
-    int tottemp = 0;
-    int moytemp = 0;
-    float var = 0;
-    float maxvar = 0;
-    int bordw = 0;
-
-
-for (int tempw = 0; tempw < width; tempw+=25)
-{
-	if(tempw>width)
-	{	bordw = width%25;
-		tempw -= bordw;}
-	for(int temph = 0; temph<=height-25; temph+=25)
+	for (int x = 0; x < width; x+=2)
 	{
-		for(int x = tempw ;x<tempw+25;x++)
-		{
-			for(int y = temph; y<temph+25;y++)
-			{
-				Uint32 pixel = get_pixel(image_surface, x, y);
-        	        	Uint8 r, g, b;
-	                	SDL_GetRGB(pixel, image_surface->format, 
-						&r, &g, &b);
-        		        tottemp += r;
-				var += (r-moytemp)*(r-moytemp);
-        			
-			}
-		}
-		moytemp = tottemp / 625;	
-		var = sqrtf(var/625);
-		if(var>maxvar)
-		{
-			maxvar = var;
-		}
-		T = (1-k)*moytemp + k*min_gray + k* (var/(maxvar*
-					(moytemp-min_gray)));
-		for(int x = tempw ;x<tempw+25;x++)
-                {
-                        for(int y = temph; y<temph+25;y++)
-                        {
-                                Uint32 pixel = get_pixel(image_surface, x, y);
-                                Uint8 r, g, b;
-                                SDL_GetRGB(pixel, image_surface->format, 
-						&r, &g, &b);
-                     		if (r < T)
-                		{
-					Uint32 pixel2 = SDL_MapRGB
-					(image_surface->format, 0, 0, 0);
-  					put_pixel(image_surface, x, y, pixel2);
-				}
-        		        else
-               			{
-					Uint32 pixel2 = SDL_MapRGB
-					(image_surface->format, 255, 255, 255);
-					put_pixel(image_surface, x, y, pixel2);
-                		}
-			}
-		}
-		var = 0;
-		tottemp = 0;
+	    if(getAround(image_surface, x, y, 765))
+	    {
+		copySurface(image_surface, case1, x+1, y+1, caseX, caseY);
+		x += caseX;
+		tmp += 1;
+		endLine += 1;
+	    	printf("endLine = %d, tmp = %d", endLine, tmp);
+	    }
+	    if (endLine%10 ==  0)
+	    {
+		endLine = 1;
+		y += caseY*1.02;
+		break;
+	    }
 	}
-	var = 0;
-	tottemp = 0;
-}
-    update_surface(screen_surface,image_surface);
-    wait_for_keypressed();
-    SDL_Surface *rotation = NULL;
-    SDL_Event event;
-    SDL_Rect rect;
-    double angle = 0;
-    SDL_Init(SDL_INIT_VIDEO);
-    int angletorotate =0;
-
-    SDL_WM_SetCaption("Type 'a' to save, anything to rotate", NULL);
-
-    int continuer = 1;
-
-
-    while(continuer)
-    {
-	int a = getchar(); 
-	if (a == 97)
-    	{
-		continuer = 0;
-		SDL_SaveBMP(rotozoomSurface(image_surface,angletorotate,zoom,1)
-			,"image3.bmp");
-    	break;
-	}
-    	else
-    	{
-		angletorotate += 1;
-	}
-        SDL_PollEvent(&event);
-        switch(event.type)
-        {
-            case SDL_QUIT:
-	    continuer = 0;
-            break;
-        }
-
-	SDL_FillRect(screen_surface, NULL, SDL_MapRGB
-	(screen_surface->format, 255, 255, 255));
-	//rotation = rotozoomSurface(image_surface, angle, 1.0, 1); 
-	//On transforme la surface image.
-	rect.x = 0;
-	rect.y = 0;
-	//we put the image at the top left
-	//I want to put it at the center.
-	rotation = rotozoomSurface(image_surface, angle, zoom, 1);
-        SDL_BlitSurface(rotation , NULL, screen_surface, &rect); 
-	//Display rotation
-        SDL_FreeSurface(rotation);
-	// We erase rotation because we are going 
-	// to redefine it in the next loop.
-	// to avoid a segmentation fault
-	SDL_Flip(screen_surface);
-	angle+=1;
-	// We increase the angle so the image rotates on itself.
-        SDL_Flip(screen_surface);
-	screen_surface = SDL_SetVideoMode(1000, 1000,32, SDL_HWSURFACE);
-}
-
-
-
-update_surface(screen_surface, image_surface);
-SDL_FreeSurface(image_surface);
-SDL_FreeSurface(screen_surface);
-void SDL_FreeSurface(SDL_Surface *surface);
-
-    return 0;
  }
+    //update_surface(screen_surface, image_surface);
+    //wait_for_keypressed();
+    return 0;
+}
+
