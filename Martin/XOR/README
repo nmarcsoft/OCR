@@ -1,12 +1,24 @@
-TODO :
-	Comprendre pourquoi on met x neuron dans le modele
+======INTRODUCTION=====
+This project represent a neural network able to make a XOR.
+
+=====HOW TO RUN ========
+To run the program run this command : 
+1/ make main
+2/ main (argument)*
+
+*The argument need to be the two binary argument to make the XOR.
 
 
-==========
-gcc -Wall -Wno-unused-variable -Wextra -Werror -lm -std=c99 -O0 -o main *.c
+=======REFERENCE===========
+https://towardsdatascience.com/implementing-the-xor-gate-using-backpropagation-in-neural-networks-c1f255b4f20d
+https://medium.com/analytics-vidhya/coding-a-neural-network-for-xor-logic-classifier-from-scratch-b90543648e8a
+https://inside-machinelearning.com/fonction-dactivation-comment-ca-marche-une-explication-simple/
+https://www.youtube.com/watch?v=og5m7f1seno&list=PLpEPgC7cUJ4b1ARx8PyIQa_sdZRL2GXw5
+https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi
+https://www.youtube.com/watch?v=DrjkjPVf7Bw&list=PLtzmb84AoqRTl0m1b82gVLcGU38miqdrC
+
+==========PROBLEM==========
+if the Makefile don't work use this command : 
 gcc -Wall -Wextra -lm -std=c99 -O0 -o main *.c
 
 
-https://gist.github.com/siddydutta/a1b48b428ddeffbd5c8dc92a3cf9a625
-https://www.geeksforgeeks.org/implementation-of-artificial-neural-network-for-xor-logic-gate-with-2-bit-binary-input/
-https://towardsdatascience.com/implementing-the-xor-gate-using-backpropagation-in-neural-networks-c1f255b4f20d
