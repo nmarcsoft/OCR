@@ -7,7 +7,7 @@ CFLAGS= -Wall -Wextra -Werror -std=c99 -O3
 LDFLAGS=
 LDLIBS= `pkg-config --libs sdl SDL_image SDL_gfx` -lm
 
-all: display first_treatment rotate
+all: display first_treatment rotate grascale
 
 display: display.o
 grayscale: pixel_operations.o grayscale.o
