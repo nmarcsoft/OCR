@@ -3,11 +3,11 @@
 CC=gcc
 
 CPPFLAGS= `pkg-config --cflags sdl` -MMD
-CFLAGS= -Wall -Wextra -Werror -std=c99 -O3
+CFLAGS= -Wall -Wextra -std=c99 -O3
 LDFLAGS=
-LDLIBS= `pkg-config --libs sdl SDL_image SDL_gfx` -lm
+LDLIBS= `pkg-config --libs sdl SDL_image SDL_gfx ` -lm
 
-all: display first_treatment rotate grascale
+all: display grayscale
 
 display: display.o
 grayscale: pixel_operations.o grayscale.o
@@ -19,6 +19,5 @@ clean:
 	${RM} *.d
 	${RM} display
 	${RM} grayscale
-	${RM} grayscale2
 
 # END

@@ -236,7 +236,7 @@ int main()
     init_sdl();
 
     image_surface = load_image("image3.bmp");
-    case1 = load_image("out1.bmp");
+    case1 = load_image("out.jpg");
     //screen_surface = display_image(image_surface);
     // VARIABLES :
     // cptHeight -> count lines vertical
