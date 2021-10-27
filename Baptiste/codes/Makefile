@@ -11,7 +11,7 @@ all: display first_treatment rotate
 
 display: display.o
 grayscale: pixel_operations.o grayscale.o
-
+grayscale2: pixel_operations.o grayscale2.o
 grayscale.o: pixel_operations.h
 
 clean:
@@ -19,5 +19,6 @@ clean:
 	${RM} *.d
 	${RM} display
 	${RM} grayscale
+	${RM} grayscale2
 
 # END

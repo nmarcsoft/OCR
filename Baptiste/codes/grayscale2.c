@@ -81,7 +81,7 @@ int main()
     SDL_Surface* image_surface;
     SDL_Surface* screen_surface;
     init_sdl();
-    image_surface = load_image("images/image_05.jpeg");
+    image_surface = load_image("images/image_01.jpeg");
     screen_surface = display_image(image_surface);
 
     int width = image_surface->w;
