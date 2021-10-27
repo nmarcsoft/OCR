@@ -23,7 +23,7 @@ double grd(){//Generate random value
 }
 
 
-double initialize(){
+double initialize(int val){
 	
 	//Input datasets
 	int inputs[4][2] = {
@@ -370,13 +370,15 @@ d_hidden_layer_sum[0][j] += d_hidden_layer[x][j];
 
 
 	}
-
-		
-		
-printf("[%lf,%lf,%lf,%lf]", predicted_output[0][0], predicted_output[0][1],
-			    predicted_output[0][2],
-			    predicted_output[0][3]);
-    
+    printf("\n");
+    printf(" The predicted value is : %lf \n", predicted_output[0][val]);
+    if(predicted_output[0][val] > 0.5){
+        printf(" Result is : 1");
+    }
+    else {
+        printf("Result is: 0 \n");
+    }
+		    
     	//printf("\n");
 	//printf("%f", sigmoid(1));
 
