@@ -66,47 +66,6 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
-int * DetectStart(int * histo, int width, int height)
-    {
-	int cpt = 0;
-	int tot = 0;
-	int i = 0;
-	int j = 0;
-	int line = 0;
-	int * coord = (int*) malloc(2 * sizeof(int));
-        while (i < height-10 && line)
-	{
-	   while (j < width - 10 && line)
-	   {
-		cpt = 0;
-		// Check on a square of 10px x 10px
-		for (int k = 0; k < 10; k++)
-		{
-		    for (int l = 0; l < 10; l++)
-		    {
-			    if (*(histo+(i+k * width + j+l)))
-			    {
-				    cpt += 1;
-			    }
-		    }
-		}
-		// If their is more than 70 black pixel, add line
-		if (cpt >= 70)
-		{
-			tot += 1;
-			if (tot > width)
-			{
-				line = 1;
-			}
-		}
-	   }
-	}
-	*coord = j;
-	*(coord+1) = i;
-	return coord;
-    }
-
-
 int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
 {
 	Uint32 pixel;
@@ -151,25 +110,29 @@ void printMatrix(int* a, int height, int width)
 
 int main()
 {
+
     SDL_Surface* image_surface;
     init_sdl();
+
     image_surface = load_image("imagemodif2.bmp");
     // VARIABLES :
     int width = image_surface->w;
     int height = image_surface->h;
     int tmp = 0;
     int endLine = 1;
+    printf("Coucou");
     int size = width * height;
     int *histo = 0;
     histo = (int*) malloc(size * sizeof(int));
-    int *start;
-    start = DetectStart(histo, width, height);
     if (histo == NULL)
     {
      printf("Can't allocated memory");
     }
+    printf("Coucou");
     histo = initializeHisto(histo, image_surface, width, height);
-    printf("x = %d, y = %d", *start, *(start + 1));
+    printf("Coucou");
+    printMatrix(histo, height, width);
+    printf("\n\n%d\n", *(histo + (977 *width + 997)));
     return 0;
 }
 
