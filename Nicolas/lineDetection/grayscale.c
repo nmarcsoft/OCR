@@ -66,41 +66,47 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
-int * DetectStart(int * histo, int width, int height)
+int * DetectStart(int * histo, int width, int height, int * coord)
     {
 	int cpt = 0;
 	int tot = 0;
 	int i = 0;
 	int j = 0;
 	int line = 0;
-	int * coord = (int*) malloc(2 * sizeof(int));
-        while (i < height-10 && line)
+        while (i < 345/*height-10*/ && !line)
 	{
-	   while (j < width - 10 && line)
+	   cpt = 0;
+	   j = 0;
+	   while (j < width - 10 && !line)
 	   {
-		cpt = 0;
 		// Check on a square of 10px x 10px
-		for (int k = 0; k < 10; k++)
+		for (int k = i; k < 5; k++)
 		{
-		    for (int l = 0; l < 10; l++)
+		    for (int l = j; l < 5; l++)
 		    {
-			    if (*(histo+(i+k * width + j+l)))
+			    //printf("x = %d i -> %d and k -> %d; y = %d j -> %d and l -> %d \n      histo value = %d", (i+k), i, k, (j+l), j, l, *(histo+((i+k) * width + (j+l))));
+			    if ((*(histo+(l * width + k))) == 1)
 			    {
 				    cpt += 1;
+				    printf("inscrease\n");
 			    }
+			    printf("%d\n", cpt);
 		    }
 		}
 		// If their is more than 70 black pixel, add line
-		if (cpt >= 70)
+		if (cpt >= 10)
 		{
 			tot += 1;
-			if (tot > width)
+			if (tot > width/10)
 			{
 				line = 1;
 			}
 		}
+		j+=10;
 	   }
+	   i++;
 	}
+	printf("x = %d; y = %d\n", j, i);
 	*coord = j;
 	*(coord+1) = i;
 	return coord;
@@ -120,6 +126,7 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	   if (r > 127)
 	   {
 	     *(histo+ (i*width +j)) = 1;
+	     printf("put 1");
 	   }
 	   else
 	    {
@@ -163,12 +170,14 @@ int main()
     int *histo = 0;
     histo = (int*) malloc(size * sizeof(int));
     int *start;
-    start = DetectStart(histo, width, height);
     if (histo == NULL)
     {
      printf("Can't allocated memory");
     }
+    int * coord = (int*) malloc(2 * sizeof(int));
     histo = initializeHisto(histo, image_surface, width, height);
+    printMatrix(histo, height, width);
+    DetectStart(histo, width, height, coord);
     printf("x = %d, y = %d", *start, *(start + 1));
     return 0;
 }
