@@ -82,7 +82,7 @@ int main()
     SDL_Surface* image_surface;                                                    
     SDL_Surface* screen_surface;                                                                                                                    
     init_sdl();                                                                 
-    image_surface = load_image("images/image_01.jpeg");                         
+    image_surface = load_image("images/image_03.jpeg");                         
     screen_surface = display_image(image_surface);                              
                                                                                 
     int width = image_surface->w;                                               
@@ -125,50 +125,52 @@ wait_for_keypressed();
 Uint32 pixel1 = get_pixel(image_surface, x, y);
         Uint8 r1, g1, b1; 
         SDL_GetRGB(pixel1, image_surface -> format, &r1, &g1, &b1);  
-	mid1 = 2*(0.3*r1 + 0.59*g1 + 0.11*b1);    
+	mid1 = 5*(0.3*r1 + 0.59*g1 + 0.11*b1);
+	//mid1 = 2*(r1 +g1 + b1);
                                  
 Uint32 pixel2 = get_pixel(image_surface, x-1, y-1);
         Uint8 r2, g2, b2;
         SDL_GetRGB(pixel2, image_surface -> format, &r2, &g2, &b2); 
 	mid2 = (-1)*(0.3*r2 + 0.59*g2 + 0.11*b2);                                     
-
+	//mid2 = (1)*(r2 + g2 + b2);
 Uint32 pixel3 = get_pixel(image_surface, x-1, y);
         Uint8 r3, g3, b3;
         SDL_GetRGB(pixel3, image_surface -> format, &r3, &g3, &b3);
-	mid3 = (-1)*(0.3*r3 + 0.59*g3 + 0.11*b3);                                     
-
+	mid3 = (5)*(0.3*r3 + 0.59*g3 + 0.11*b3);                                     
+	//mid3 = (1)*(r3 + g3 + b3); 
 Uint32 pixel4 = get_pixel(image_surface, x-1, y+1);
         Uint8 r4, g4, b4;
 	SDL_GetRGB(pixel4, image_surface -> format, &r4, &g4, &b4);
 	mid4 = (-1)*(0.3*r4 + 0.59*g4 + 0.11*b4);             
-
+	//mid4 = (1)*(r4 + g4 + b4); 
 Uint32 pixel5 = get_pixel(image_surface, x, y-1);
         Uint8 r5, g5, b5; 
         SDL_GetRGB(pixel5, image_surface -> format, &r5, &g5, &b5); 
-	mid6 = (2)*(0.3*r5 + 0.59*g5 + 0.11*b5);                                     
-
+	mid6 = (-1)*(0.3*r5 + 0.59*g5 + 0.11*b5);                                     
+	//mid5 = (2)*(r5 + g5 + b5);
 Uint32 pixel6 = get_pixel(image_surface, x+1, y-1);
         Uint8 r6, g6, b6;
         SDL_GetRGB(pixel6, image_surface -> format, &r6, &g6, &b6); 
 	mid7 = (-1)*(0.3*r6 + 0.59*g6 + 0.11*b6);                                     
-
+	//mid6 = (1)*(r6 + g6 + b6);
 Uint32 pixel7 = get_pixel(image_surface, x, y+1);
         Uint8 r7, g7, b7; 
         SDL_GetRGB(pixel7, image_surface -> format, &r7, &g7, &b7);
-	mid8 = (2)*(0.3*r7 + 0.59*g7 + 0.11*b7);                                     
-
+	mid8 = (5)*(0.3*r7 + 0.59*g7 + 0.11*b7);                                     
+	//mid7 = (2)*(r7 + g7 + b7);
 Uint32 pixel8 = get_pixel(image_surface, x+1, y);
         Uint8 r8, g8, b8; 
         SDL_GetRGB(pixel8, image_surface -> format, &r8, &g8, &b8); 
-	mid8 = (-1)*(0.3*r8 + 0.59*g8 + 0.11*b8);                    
-
+	mid8 = (5)*(0.3*r8 + 0.59*g8 + 0.11*b8);                    
+	//mid8 = (1)*(r8 + g8 + b8);
 	Uint32 pixel9 = get_pixel(image_surface, x+1, y+1);  
         Uint8 r9, g9, b9; 
         SDL_GetRGB(pixel9, image_surface -> format, &r9, &g9, &b9);            
         mid9 = (-1)*(0.3*r9 + 0.59*g9 + 0.11*b9);                                 
-
+	//mid9 = (1)*(r9 + g9 + b9);
 	float flou = mid1+mid2+mid3+mid4+mid5+mid6+mid7+mid8+mid9;             
 	flou = flou/9;                                                         
+	printf("%f  ",flou);
 	Uint32 pixelfin = SDL_MapRGB(image_surface->format, flou, flou, flou); 
         put_pixel(image_surface, x, y, pixelfin);                              
        }                                                                        
