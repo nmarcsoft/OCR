@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
-#include "include/mnist_file.h"
-#include "include/neural_network.h"
+#include "mnist_file.h"
+#include "nn.h"
 
-#define EPOCH 1000
-//#define EPOCH 50
+#define EPOCH 10000
+//#define EPOCH 10
 #define BATCH_SIZE 100
 
 const char *train_images_file = "data/train-images-idx3-ubyte";
@@ -33,6 +33,26 @@ float calculate_accuracy(mnist_dataset_t * dataset, neural_network_t * network)
     return ((float) correct) / ((float) dataset->size);
 }
 
+
+void write(neural_network_t *network){
+    FILE *f = fopen("program.txt", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+    for(int i = 0; i < MNIST_LABELS; i++){
+        fprintf(f, "%f\n", network->bias[i]);
+    }
+    for(int i = 0; i < MNIST_LABELS; i++){
+        for(int j = 0; j < image_size; j++){
+            fprintf(f, "%f\n", network->weights[i][j]);
+        }
+    }
+    fclose(f); 
+    
+}
+
 int main(int argc, char *argv[])
 {
     mnist_dataset_t *train_dataset, *test_dataset;
@@ -50,17 +70,10 @@ int main(int argc, char *argv[])
         accuracy = calculate_accuracy(test_dataset, &network);
         printf("Epoch %04d\t Accuracy: %.3f\n", i, accuracy);
     }
-    //PREDICT
-    int predict;
-    float activations[MNIST_LABELS], max_activation;
-    hypothesis(&test_dataset->images[0], &network, activations);
-    for (int j = 0, predict = 0, max_activation = activations[0]; j < MNIST_LABELS; j++) {
-            if (max_activation < activations[j]) {
-                max_activation = activations[j];
-                predict = j;
-            }
-        }
-        printf("%i", predict);
+
+    //SAVE
+    //write(&network);
+        
     //FINISH
     mnist_free_dataset(train_dataset);
     mnist_free_dataset(test_dataset);

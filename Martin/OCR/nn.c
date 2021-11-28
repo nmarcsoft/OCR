@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "include/mnist_file.h"
-#include "include/neural_network.h"
+#include "mnist_file.h"
+#include "nn.h"
 
 #define RAND_FLOAT() (((float) rand()) / ((float) RAND_MAX))
 

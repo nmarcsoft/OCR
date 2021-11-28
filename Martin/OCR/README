@@ -1,1 +1,1 @@
-gcc train.c mnist_file.c neural_network.c -lm -o train
+gcc train.c data.c nn.c -lm -o train

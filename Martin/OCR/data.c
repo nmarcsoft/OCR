@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "include/mnist_file.h"
+#include "mnist_file.h"
 
 
 uint32_t to_uint32(uint32_t in)
