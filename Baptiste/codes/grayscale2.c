@@ -106,7 +106,7 @@ int lignedroite (SDL_Surface* image_surface,int i,int j,int toreturn)
 
 	}
 }
-
+//Straight line
 
 int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 {
@@ -150,7 +150,7 @@ int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 
 	}
 }
-
+//Line
 
 
     
@@ -160,7 +160,7 @@ int main()
     SDL_Surface* image_surface;                                                    
     SDL_Surface* screen_surface;                                                                                                                    
     init_sdl();                                                                 
-    image_surface = load_image("images/image_04.jpeg");                         
+    image_surface = load_image("images/image_02.jpeg");                         
     screen_surface = display_image(image_surface);                              
                                                                    
     int width = image_surface->w;                                               
@@ -180,7 +180,8 @@ int main()
     else                                                                        
     {                                                                           
 	zoom = 1000/w;                                                          
-    }                                                                        
+    }   
+//1000x1000 window                                                                     
 SDL_SaveBMP(rotozoomSurface(image_surface,0,zoom,1),"image3.bmp");
 image_surface = load_image("image3.bmp");
      screen_surface = display_image(image_surface);
@@ -212,6 +213,7 @@ wait_for_keypressed();
          put_pixel(image_surface, x, y, pixel2);
        }
     }
+//grayscale
 wait_for_keypressed();
 for(int x = 0; x < width; x++)
     {
@@ -227,38 +229,7 @@ for(int x = 0; x < width; x++)
     }
 update_surface(screen_surface,image_surface);
 wait_for_keypressed();
-
-
-/*int i =0;
-int j = 0;
-int r = 0;
-int x= 0;
-for (; i < height; i++)
-    {
-      for (; j < width; j++)
-      {
-        Uint32 pixel = get_pixel(image_surface, j, i);
-        Uint8 r, g, b;
-        SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-        if(r==0)
-        {break;}
-      }
-      if(r==0)
-      { x=i;
-	      break;}
-    }
-
-while(angletorotate == 0 && x>0) 
-{
-Uint32 pixel2 = get_pixel(image_surface, x, j+20);
-Uint8 r2, g2, b2;
-SDL_GetRGB(pixel2, image_surface->format, &r2, &g2, &b2);
-
-angletorotate = (j+20)/(i-x);
-
-x--;
-}*/
-
+//Contrast
 
     float k = 0.5;
     // calculation R = o max
@@ -327,6 +298,8 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	var = 0;
 	tottemp = 0;
 }
+//Binarisation
+
 	for(int k = 0; k <= width-1; k+=width)
     	{
    		for(int l = 0; l <= height-1; l++)
@@ -345,55 +318,12 @@ for (int tempw = 0; tempw < width; tempw+=25)
                         put_pixel(image_surface, l, k, pixel2);
                 }
         }
-
+//white line around the window
 
 
     update_surface(screen_surface,image_surface);
     wait_for_keypressed();
-/*
-int suppr = 1;
-for(int x = 0; x < width-5; x = x+5)
-    {
-        for(int y = 0; y < height-5;y = y+5)
-        {
-            for(int i = x; i < x+5; i++)
-            {
-                for(int j = y; j < y+5; j++)
-                {
-		    Uint32 pixel = get_pixel(image_surface,i,j);
-                     Uint8 r, g, b;
-                     SDL_GetRGB(pixel, image_surface->format,
-                    				    &r, &g, &b);
-		    if(r==0 && (j == y || j == y+4 
-		       || i == x || i == x+4))
-			{
-				suppr = 0;	
-			}
-                }
-            }
-	if(suppr == 1)
-	{   
-	printf("deb"); 
-	    for(int k = x; k < x+5; k++)
-            {
-                for(int l = y; l < y+5; l++)
-                {
-                    Uint32 pixelnoir = get_pixel(image_surface,k,l);
-                     Uint8 rn, gn, bn;
-                     SDL_GetRGB(pixelnoir, image_surface->format,
-                                                    &rn, &gn, &bn);
-                    if(rn==0)
-			{
-                             Uint32 pixelnoir2 = SDL_MapRGB
-                             (image_surface->format, 255, 255, 255);
-                             put_pixel(image_surface, k, l, pixelnoir2);     
-                	}
-                }
-            }
-	}
-        }
-    }
-*/
+
     SDL_Init(SDL_INIT_VIDEO);
     SDL_WM_SetCaption("Type 'a' to save, anything to rotate", NULL);
 
@@ -490,24 +420,11 @@ for(int x = 0; x < width-5; x = x+5)
 	                put_pixel(image_surface, x, y, pixeltmp);
 			}
 }}}
-/*		if((r1+r2+r3+r4+r5+r6+r7+r8)/8 > 254)
-		{
-			for(int k = x; k < x+5; k++)
-             		{
-                 	  for(int l = y; l < y+5; l++)
-                	  {
-                            Uint32 pixel2 = SDL_MapRGB
-                            (image_surface->format, 255, 255, 255);
-                            put_pixel(image_surface, k, l, pixel2);
-                 	  }
-             		}
-		} 
-		}
-*/
+//Noise suppression
 	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
         image_surface = load_image("image3.bmp");
         screen_surface = display_image(image_surface);
-    y = height/2;	
+	y = height/2;	
 	while (white==0)
 	{
 		printf("b");
@@ -516,6 +433,7 @@ for(int x = 0; x < width-5; x = x+5)
 		x+=1;
 		if(r == 255){white = 1;}	
 	}
+	// Waiting for one white pixel
 	
 	while (black==0 && !(line(image_surface,x,y,0)))
 	{
@@ -525,6 +443,7 @@ for(int x = 0; x < width-5; x = x+5)
 		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
 		if(r == 0){black = 1;}	
 	}
+	//Waiting for one black pixel
 	
 	 while(!(lignedroite(image_surface,x,y,0)))
          {	
@@ -569,13 +488,14 @@ for(int x = 0; x < width-5; x = x+5)
 				x+=1;
 				Uint32 pixel = get_pixel(image_surface, x, y);
    	        		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
-			}
+			}//adjust if the rotation loose the line
 		}
 		
 	}	
+	//rotate while no line found
 	printf(" trouvéé " );
 SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
-
+//save
 
 update_surface(screen_surface, image_surface);
 SDL_FreeSurface(image_surface);
