@@ -10,8 +10,8 @@ float scale(float x){
     return x / 255.0f;
 }
 
-float resize(float x){
-    if(x >= 0.50){
+int resize(float x){
+    if(x != 0){
         return 1;
     }
     else{
@@ -53,8 +53,13 @@ void hypothesis_real(int *image, neural_network_t *network, float activations[MN
         activations[i] = network->bias[i];
         for (int j = 0; j < image_size; j++){
             activations[i] += (network->weights[i][j] * *(image + j));
+//	    printf("%d ", *(image + j));
+//	    if(j % 28 == 0){
+//	    	printf("\n");
+//		}
         }
     }
+  //  printf("\n");
     neural_network_softmax(activations, MNIST_LABELS);
 }
 
@@ -66,8 +71,14 @@ void hypothesis(mnist_image_t *image, neural_network_t *network, float activatio
         activations[i] = network->bias[i];
         for (int j = 0; j < image_size; j++) {
             activations[i] += (network->weights[i][j] * resize(scale(image->pixels[j])));
+//	    printf("%d ", resize(scale(image->pixels[j])));
+//	    if(j % 28 == 0){
+//	    	printf("\n");
+//		}
         }
     }
+  //  printf("\n");
+    //printf("\n");
     neural_network_softmax(activations, MNIST_LABELS);
 }
 

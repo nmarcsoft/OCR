@@ -24,6 +24,28 @@ SDL_Surface* load_image(char *path)
     return img;
 }
 
+void copySurface(int * from, SDL_Surface* to, int width, int height)
+{
+	Uint32 pixel;
+	for (int i = 0; i < height; i++)
+	{
+	    for (int j = 0; j < width; j++)
+	    {
+	    	if (*(from + (i*width+j)) == 1)
+		{
+		  pixel = SDL_MapRGB(to->format, 1, 1, 1);
+		  put_pixel(to, j, i, pixel);
+		}
+		else
+		{
+		  pixel = SDL_MapRGB(to->format, 1, 1, 1);
+		  put_pixel(to, j, i, pixel);
+		}
+	    }
+	}
+	SDL_SaveBMP(to, "out.bmp");
+	printf("Saved");
+}
 
 SDL_Surface* display_image(SDL_Surface *img)
 {
@@ -73,45 +95,82 @@ int * DetectStart(int * histo, int width, int height, int * coord)
 	int i = 0;
 	int j = 0;
 	int line = 0;
-        while (i < 345/*height-10*/ && !line)
+	int ReturnX = 0;
+	int ReturnY = 0;
+        while (i < height-10 && !line)
 	{
-	   cpt = 0;
+	   ReturnY = i;
 	   j = 0;
+	   ReturnX = j;
+	   tot = 0;
 	   while (j < width - 10 && !line)
 	   {
+	   cpt = 0;
 		// Check on a square of 10px x 10px
-		for (int k = i; k < 5; k++)
+		for (int k = i; k < i + 5; k++)
 		{
-		    for (int l = j; l < 5; l++)
+		    for (int l = j; l < j + 5; l++)
 		    {
-			    //printf("x = %d i -> %d and k -> %d; y = %d j -> %d and l -> %d \n      histo value = %d", (i+k), i, k, (j+l), j, l, *(histo+((i+k) * width + (j+l))));
-			    if ((*(histo+(l * width + k))) == 1)
+			    if ((*(histo+(k * width + l))) == 0)
 			    {
+			    	    
 				    cpt += 1;
-				    printf("inscrease\n");
 			    }
-			    printf("%d\n", cpt);
+			    
 		    }
 		}
 		// If their is more than 70 black pixel, add line
-		if (cpt >= 10)
+		if (cpt >= 20)
 		{
 			tot += 1;
-			if (tot > width/10)
+			if (tot >= 50)
 			{
 				line = 1;
 			}
+			cpt = 0;
 		}
 		j+=10;
-	   }
-	   i++;
+	  }
+	   i+=10;
 	}
-	printf("x = %d; y = %d\n", j, i);
-	*coord = j;
-	*(coord+1) = i;
+	*coord = ReturnX;
+	*(coord+1) = ReturnY;
 	return coord;
     }
 
+int * getCase(int * histo, int width, int height, int * coord, int size, int num, int * toReturn)
+{
+	if (*coord == 0)
+	{
+		*coord = 1;
+	}
+	printf("%d", *(histo+1300));
+	// Merci les noeuds au cerveau !!!
+	//int j = *(histo+(*(coord+1) + num * height/9));
+	//int i = *(histo+(*coord) + num * width/9);
+	int toGoH = (height-1)/9;
+	int toGoW = (width-1)/9;
+	int toPutX = 0;
+	int c = 0;
+	for (int i = *(coord+1); i < *(coord+1) + toGoH; i++)
+	{
+	    for (int j = *(coord); j < *(coord) + toGoW; j++)
+	    {
+	printf("coord i = %d ", (i - *(coord+1)));
+	printf("limitTest (1000) = %d\n",((i- *(coord+1))* toGoW + (j-(*coord))));
+	    	*(toReturn+(i - *(coord+1)+ j - *(coord))) = *(histo+((i * toGoW + j))); 
+	    }
+	    toPutX++;
+	}
+	printf("toGow = %d, toGoH = %d", toGoW, toGoH);
+	return toReturn;
+	/*
+	int get = 0;
+	while (i < height && !get)
+	{
+		while (
+*/
+}
 
 int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
 {
@@ -126,7 +185,6 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	   if (r > 127)
 	   {
 	     *(histo+ (i*width +j)) = 1;
-	     printf("put 1");
 	   }
 	   else
 	    {
@@ -136,6 +194,7 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	}
 	return histo;
 }
+
 
 void printMatrix(int* a, int height, int width)
 {
@@ -160,7 +219,7 @@ int main()
 {
     SDL_Surface* image_surface;
     init_sdl();
-    image_surface = load_image("imagemodif2.bmp");
+    image_surface = load_image("imagemodif3.bmp");
     // VARIABLES :
     int width = image_surface->w;
     int height = image_surface->h;
@@ -176,9 +235,21 @@ int main()
     }
     int * coord = (int*) malloc(2 * sizeof(int));
     histo = initializeHisto(histo, image_surface, width, height);
-    printMatrix(histo, height, width);
-    DetectStart(histo, width, height, coord);
-    printf("x = %d, y = %d", *start, *(start + 1));
+    //printMatrix(histo, height, width);
+    coord = DetectStart(histo, width, height, coord);
+    printf("Coord de départ : x -> %d, y -> %d\n", *coord, *(coord+1));
+    int * Case = 0; 
+    printf("%d", *(histo+24006));
+    Case = (int*) malloc(size/81 * sizeof(int));
+    if (Case == NULL)
+    {
+	printf("lineDetection : Can't allocated memory");
+    }
+    Case = getCase(histo, width, height, coord, size, 2, Case);
+    printf("allocated : %d, loop : %d", size/81, ((width-1)/9)*((height-1)/9));
+    printf("pixel", *(Case+(59 + 32)));
+    printMatrix(Case, 90, 90);
+    copySurface(Case, load_image("out.bmp"), 99, 99);
     return 0;
 }
 

@@ -5,7 +5,7 @@
 #include "mnist_file.h"
 #include "nn.h"
 
-#define EPOCH 10000
+#define EPOCH 200
 //#define EPOCH 10
 #define BATCH_SIZE 100
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     }
 
     //SAVE
-    //write(&network);
+    write(&network);
         
     //FINISH
     mnist_free_dataset(train_dataset);
