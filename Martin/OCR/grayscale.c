@@ -219,7 +219,8 @@ int main(){
     //PREDICT
     int predict = 0;
     float activations[MNIST_LABELS], max_activations;
-    hypothesis_real(histo, &network, activations);
+    hypothesis(&test_dataset->images[0], &network, activations);
+    //hypothesis_real(histo, &network, activations);
     max_activations = activations[0];
         for(int z = 0; z < 10; z++){
 		printf("%f ", activations[z]);
@@ -227,7 +228,6 @@ int main(){
                 max_activations = activations[z];
                 predict = z;
             }
-		printf("\npredict = %d\n", predict);
         }
     printMatrix(histo, 28, 28);
     printf("%d", predict);   

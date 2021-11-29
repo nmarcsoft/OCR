@@ -5,7 +5,7 @@
 #include "mnist_file.h"
 #include "nn.h"
 
-#define EPOCH 200
+#define EPOCH 5000
 //#define EPOCH 10
 #define BATCH_SIZE 100
 
