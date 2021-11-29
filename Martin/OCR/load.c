@@ -64,7 +64,7 @@ int main(){
     //PREDICT
     int predict;
     float activations[MNIST_LABELS], max_activations;
-    hypothesis(&test_dataset->images[0], &network, activations);
+    hypothesis_real(/*TODO*/, &network, activations);
     max_activations = activations[0];
         for(int z = 1; z < 10; z++){
             if(max_activations < activations[z]){

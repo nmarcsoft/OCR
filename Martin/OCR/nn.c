@@ -45,6 +45,21 @@ void neural_network_softmax(float *activations, int length)
         activations[i] /= sum;
     }
 }
+
+//A FAIRE
+void hypothesis_real(int *image, neural_network_t *network, float activations[MNIST_LABELS])
+{
+    for (int i = 0; i < MNIST_LABELS; i++) {
+        activations[i] = network->bias[i];
+        for (int j = 0; j < image_size; j++){
+            activations[i] += (network->weights[i][j] * *(image + j));
+        }
+    }
+    neural_network_softmax(activations, MNIST_LABELS);
+}
+
+
+
 void hypothesis(mnist_image_t *image, neural_network_t *network, float activations[MNIST_LABELS])
 {
     for (int i = 0; i < MNIST_LABELS; i++) {
