@@ -9,10 +9,30 @@
 //#define EPOCH 10
 #define BATCH_SIZE 100
 
+
+float tscale(float x){
+    return x / 255.0f;
+}
+
+int tresize(float x){
+    if(x != 0){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
 const char *train_images_file = "data/train-images-idx3-ubyte";
 const char *train_labels_file = "data/train-labels-idx1-ubyte";
 const char *test_images_file = "data/t10k-images-idx3-ubyte";
 const char *test_labels_file = "data/t10k-labels-idx1-ubyte";
+
+void resize_data(mnist_image_t *image){
+    for(int j = 0; j < image_size; j++){
+        tresize(tscale(image->pixels[j]));
+    }
+}
 
 float calculate_accuracy(mnist_dataset_t * dataset, neural_network_t * network)
 {
@@ -33,6 +53,9 @@ float calculate_accuracy(mnist_dataset_t * dataset, neural_network_t * network)
     return ((float) correct) / ((float) dataset->size);
 }
 
+int find_size(mnist_dataset_t *dataset){
+    return dataset->size;
+}
 
 void write(neural_network_t *network){
     FILE *f = fopen("program.txt", "w");
@@ -62,6 +85,17 @@ int main(int argc, char *argv[])
     train_dataset = mnist_get_dataset(train_images_file, train_labels_file);
     test_dataset = mnist_get_dataset(test_images_file, test_labels_file);
     neural_network_random_weights(&network);
+    //Je vais essayer de rescale la
+    int size_dataset;
+    size_dataset = find_size(train_dataset);
+
+    for(int i = 0; i < size_dataset; i++){
+        resize_data(&train_dataset->images[i]);
+    }
+    size_dataset = find_size(test_dataset);
+    for(int k = 0; size_dataset; k++){
+        resize_data(&test_dataset->images[k]);
+    }
     int batches = train_dataset->size / BATCH_SIZE;
     //TRAIN
     for (int i = 0; i < EPOCH; i++) {
