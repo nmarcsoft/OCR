@@ -70,7 +70,7 @@ void hypothesis(mnist_image_t *image, neural_network_t *network, float activatio
     for (int i = 0; i < MNIST_LABELS; i++) {
         activations[i] = network->bias[i];
         for (int j = 0; j < image_size; j++) {
-            activations[i] += (network->weights[i][j] * resize(scale(image->pixels[j])));
+            activations[i] += (network->weights[i][j] * image->pixels[j]);
 //	    printf("%d ", resize(scale(image->pixels[j])));
 //	    if(j % 28 == 0){
 //	    	printf("\n");
@@ -90,7 +90,7 @@ float neural_network_gradient_update(mnist_image_t *image, neural_network_t *net
     for (int i = 0; i < MNIST_LABELS; i++) {
         bias_grad = (i == label) ? activations[i] - 1 : activations[i];
         for (int j = 0; j < image_size; j++) {
-            weights_grad = bias_grad * resize(scale(image->pixels[j]));
+            weights_grad = bias_grad * (image->pixels[j]);
             gradient->weights_grad[i][j] += weights_grad;
         }
         gradient->bias_grad[i] += bias_grad;
