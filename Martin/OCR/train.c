@@ -5,7 +5,7 @@
 #include "mnist_file.h"
 #include "nn.h"
 
-#define EPOCH 30000
+#define EPOCH 5000
 //#define EPOCH 10
 #define BATCH_SIZE 100
 
@@ -85,10 +85,8 @@ int main(int argc, char *argv[])
     train_dataset = mnist_get_dataset(train_images_file, train_labels_file);
     test_dataset = mnist_get_dataset(test_images_file, test_labels_file);
     neural_network_random_weights(&network);
-    //Je vais essayer de rescale la
     int size_dataset;
     size_dataset = find_size(train_dataset);
-
     for(int i = 0; i < size_dataset; i++){
         resize_data(&train_dataset->images[i]);
     }
