@@ -144,14 +144,14 @@ int * getCase(int * histo, int width, int height, int * coord, int size, int num
 	{
 		*coord = 1;
 	}
-	printf("%d", *(histo+1300));
 	// Merci les noeuds au cerveau !!!
 	//int j = *(histo+(*(coord+1) + num * height/9));
 	//int i = *(histo+(*coord) + num * width/9);
 	int toGoH = (height-1)/9;
 	int toGoW = (width-1)/9;
-	int toPutX = 0;
-	int c = 0;
+	int toGet = num * toGoW;
+	printf("%d", toGet);
+	int cpt = 0;
 	for (int i = 0; i < toGoH; i++)
 	{
 	    for (int j = 0; j < toGoW; j++)
@@ -162,13 +162,12 @@ int * getCase(int * histo, int width, int height, int * coord, int size, int num
 			printf("DICK");
 		}
 	//printf("limitTest (10000) = %d\n",/*((i + *(coord+1) * toGoW) + j + *(coord)));*/*(histo+((i * width + j))));
-		printf("x = %d : y = %d\n", i + *(coord+1), j + *coord);
-		printf("            value = %d\n", *(histo + i + *(coord+1) * width + j + *coord));
-	    	*(Case+(i * toGoW + j)) = *(histo + (((i + *(coord+1)) * width + j + *coord))); 
+	    	*(Case+(i * toGoW + j)) = *(histo + (toGet + ((i + *(coord+1)) * width + j + *coord))); 
+		printf("VALUE = %d\n",*(Case+(i * toGoW + j))); 
+		cpt++;
 	    }
-	    toPutX++;
 	}
-	printf("toGow = %d, toGoH = %d", toGoW, toGoH);
+	printf("%d", cpt);
 	return Case;
 	/*
 	int get = 0;
@@ -221,6 +220,72 @@ void printMatrix(int* a, int height, int width)
    printf("\n\n");
 }
 
+int Width(int * histo, int coordX, int width)
+{
+	int i = coordX;
+	while (*(histo + i) == 0 && i < width)
+	{
+		i++;
+	}
+	return i;
+}
+
+int Height(int * histo, int coordY, int width)
+{
+	int i = coordY;
+	while (*(histo+(i*width)) == 0 && i < width)
+	{
+		i++;
+	}
+	return i;
+}
+void cut(int * histo, int i, int j, int widthR, int heightR, int width)
+{
+	int *toPrint = (int*) malloc((widthR/9*heightR/9) * sizeof(int));
+	for (int k = 0; k < heightR/9; k++)
+	{
+		for (int l = 0; l < widthR/9; l++)
+		{
+			*(toPrint + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
+		}
+	}
+	printf("CALL");
+	printMatrix(toPrint, widthR/9, heightR/9);
+	printf("Done");
+}
+
+void DoneAll(int * histo, int * coord, int width, int height)
+{
+	int widthReal = Width(histo, *coord, width);
+	widthReal = 1000;
+	printf("RealW = %d\n", widthReal);
+	int heightReal = Height(histo, *coord+1, width);
+	heightReal = 1000;
+	printf("WeightR = %d\n", heightReal);
+	int Stop = 0;
+	for (int i = *(coord+1); i < heightReal; i++)
+	{
+		for (int j = *coord; j < widthReal; j++)
+		{
+			if (*(histo + (i * widthReal + j)) == 1)
+			{
+			cut(histo, i, j, widthReal, heightReal, width);
+			Stop++;
+			}
+			if (Stop == 1)
+			{
+			break;
+			}
+		}
+		if (Stop == 1)
+		{
+		break;
+		}
+	}
+}
+
+
+
 int main()
 {
     SDL_Surface* image_surface;
@@ -241,19 +306,19 @@ int main()
     }
     int * coord = (int*) malloc(2 * sizeof(int));
     histo = initializeHisto(histo, image_surface, width, height);
-    //printMatrix(histo, height, width);
+   // printMatrix(histo, height, width);
     coord = DetectStart(histo, width, height, coord);
     printf("Coord de départ : x -> %d, y -> %d\n", *coord, *(coord+1));
-    int * Case = 0; 
-    Case = (int*) malloc(size/81 * sizeof(int));
-    if (Case == NULL)
-    {
-	printf("lineDetection : Can't allocated memory");
-    }
-    Case = getCase(histo, width, height, coord, size, 2, Case);
+    //int * Case = 0; 
+    //Case = (int*) malloc(size/81 * sizeof(int));
+    //if (Case == NULL)
+    //{
+//	printf("lineDetection : Can't allocated memory");
+  //  }
+    //Case = getCase(histo, width, height, coord, size, 2, Case);
     //printf("allocated : %d, loop : %d", size/81, ((width-1)/9)*((height-1)/9));
-    copySurface(Case, load_image("out.bmp"), 99, 99);
-    printMatrix(Case, 111, 111);
+    DoneAll(histo, coord, width, height);
+    //copySurface(Case, load_image("out.bmp"), 99, 99);
+    //printMatrix(Case, 111, 111);
     return 0;
-}
-
+} 
