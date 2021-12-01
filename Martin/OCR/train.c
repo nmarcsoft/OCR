@@ -76,6 +76,17 @@ void write(neural_network_t *network){
     
 }
 
+
+void print_image(mnist_image_t *image){
+	for(int j = 0; j < image_size; j++){
+		printf("%d ", image->pixels[j]);
+		if(j % 28 == 0){
+			printf("\n");
+		}
+	}
+	printf("\n");
+}
+
 int main(int argc, char *argv[])
 {
     mnist_dataset_t *train_dataset, *test_dataset;
@@ -94,6 +105,7 @@ int main(int argc, char *argv[])
     for(int k = 0; k < size_dataset; k++){
         resize_data(&test_dataset->images[k]);
     }
+    print_image(&train_dataset->images[0]);
     int batches = train_dataset->size / BATCH_SIZE;
     //TRAIN
     for (int i = 0; i < EPOCH; i++) {
