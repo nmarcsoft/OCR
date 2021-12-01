@@ -160,7 +160,8 @@ int main()
     SDL_Surface* image_surface;                                                
     SDL_Surface* screen_surface;                                               
     init_sdl();                                                                
-    image_surface = load_image("images/image01rot.jpg");                        
+    image_surface = load_image("images/image_04.jpeg");      
+    //image_surface = load_image("images/image01rot.jpg");                        
     screen_surface = display_image(image_surface);                             
                                                                    
     int width = image_surface->w;                                              
@@ -215,6 +216,125 @@ wait_for_keypressed();
     }
 //grayscale
 wait_for_keypressed();
+/*
+for(int x = 1; x < width-1; x++)
+    {
+        for(int y = 1; y < height-1;y++)
+        {
+Uint32 pixel = get_pixel(image_surface,x,y);
+            Uint8 r, g, b;
+            SDL_GetRGB(pixel, image_surface->format,
+                                       &r, &g, &b);
+Uint32 pixel1 = get_pixel(image_surface,x-1,y-1);
+            Uint8 r1, g1, b1;
+            SDL_GetRGB(pixel1, image_surface->format,
+                                       &r1, &g1, &b1);
+Uint32 pixel2 = get_pixel(image_surface,x-1,y);
+            Uint8 r2, g2, b2;
+            SDL_GetRGB(pixel2, image_surface->format,
+                                       &r2, &g2, &b2);
+Uint32 pixel3 = get_pixel(image_surface,x-1,y+1);
+            Uint8 r3, g3, b3;
+            SDL_GetRGB(pixel3, image_surface->format,
+                                       &r3, &g3, &b3);
+Uint32 pixel4 = get_pixel(image_surface,x,y-1);
+            Uint8 r4, g4, b4;
+            SDL_GetRGB(pixel4, image_surface->format,
+                                       &r4, &g4, &b4);
+Uint32 pixel5 = get_pixel(image_surface,x,y+1);
+            Uint8 r5, g5, b5;
+            SDL_GetRGB(pixel5, image_surface->format,
+                                       &r5, &g5, &b5);
+Uint32 pixel6 = get_pixel(image_surface,x+1,y-1);
+            Uint8 r6, g6, b6;
+            SDL_GetRGB(pixel6, image_surface->format,
+                                       &r6, &g6, &b6);
+Uint32 pixel7 = get_pixel(image_surface,x+1,y);
+            Uint8 r7, g7, b7;
+            SDL_GetRGB(pixel7, image_surface->format,
+                                       &r7, &g7, &b7);
+Uint32 pixel8 = get_pixel(image_surface,x+1,y+1);
+            Uint8 r8, g8, b8;
+            SDL_GetRGB(pixel8, image_surface->format,
+                                       &r8, &g8, &b8);
+	float rtot = (r+r1+r2+r3+r4+r5+r6+r7+r8)/9;
+		Uint32 pixeltmp = SDL_MapRGB
+                (image_surface->format, rtot, rtot, rtot);
+                put_pixel(image_surface, x, y, pixeltmp);
+		}
+}
+
+*/
+
+for(int x = 1; x < width-1; x++)
+    {
+        for(int y = 1; y < height-1;y++)
+        {
+Uint32 pixel = get_pixel(image_surface,x,y);
+            Uint8 r, g, b;
+            SDL_GetRGB(pixel, image_surface->format,
+                                       &r, &g, &b);
+	int tableau[9];
+Uint32 pixel1 = get_pixel(image_surface,x-1,y-1);
+            Uint8 r1, g1, b1;
+            SDL_GetRGB(pixel1, image_surface->format,
+                                       &r1, &g1, &b1);
+Uint32 pixel2 = get_pixel(image_surface,x-1,y);
+            Uint8 r2, g2, b2;
+            SDL_GetRGB(pixel2, image_surface->format,
+                                       &r2, &g2, &b2);
+Uint32 pixel3 = get_pixel(image_surface,x-1,y+1);
+            Uint8 r3, g3, b3;
+            SDL_GetRGB(pixel3, image_surface->format,
+                                       &r3, &g3, &b3);
+Uint32 pixel4 = get_pixel(image_surface,x,y-1);
+            Uint8 r4, g4, b4;
+            SDL_GetRGB(pixel4, image_surface->format,
+                                       &r4, &g4, &b4);
+Uint32 pixel5 = get_pixel(image_surface,x,y+1);
+            Uint8 r5, g5, b5;
+            SDL_GetRGB(pixel5, image_surface->format,
+                                       &r5, &g5, &b5);
+Uint32 pixel6 = get_pixel(image_surface,x+1,y-1);
+            Uint8 r6, g6, b6;
+            SDL_GetRGB(pixel6, image_surface->format,
+                                       &r6, &g6, &b6);
+Uint32 pixel7 = get_pixel(image_surface,x+1,y);
+            Uint8 r7, g7, b7;
+            SDL_GetRGB(pixel7, image_surface->format,
+                                       &r7, &g7, &b7);
+Uint32 pixel8 = get_pixel(image_surface,x+1,y+1);
+            Uint8 r8, g8, b8;
+            SDL_GetRGB(pixel8, image_surface->format,
+                                       &r8, &g8, &b8);
+		tableau[0] = r1;
+		tableau[1] = r2;
+		tableau[2] = r3;
+		tableau[3] = r4;
+		tableau[4] = r5;
+		tableau[5] = r6;
+		tableau[6] = r7;
+		tableau[7] = r8;
+		tableau[8] = r;
+		for (int t = 0; t < 8; t++)
+		{
+			for (int r = 0; r < 8; r++)
+                	{
+				if(tableau[r]>tableau[r+1])
+				{
+					int temp = tableau[r];
+					tableau[r] = tableau[r+1];
+					tableau[r+1] = temp;
+				}
+                	}
+		}
+		Uint32 pixeltmp = SDL_MapRGB
+                (image_surface->format, tableau[4], tableau[4], tableau[4]);
+                put_pixel(image_surface, x, y, pixeltmp);
+		}
+}
+
+
 for(int x = 0; x < width; x++)
     {
        for(int y = 0; y < height;y++)
@@ -444,11 +564,12 @@ for (int tempw = 0; tempw < width; tempw+=25)
 		if(r == 0){black = 1;}	
 	}
 	//Waiting for one black pixel
-	int angleline = 0;
+	double angleline = 0;
+	double linea = 0;
 	 while(!(lignedroite(image_surface,x,y,0)))
          {	
-		angle += 1;
-		printf("      %d       ",x);
+		angleline += 1;
+		printf("rentre dans boucle.      %d       ",x);
 		y = height/2;
 		SDL_SaveBMP(rotozoomSurface(image_surface,1,1,1),"image3.bmp");
 		image_surface = load_image("image3.bmp");                      
@@ -491,9 +612,50 @@ for (int tempw = 0; tempw < width; tempw+=25)
 		}
 		
 	}	
-	//ENLEVER LES PIXELS NOIRS DU HAUT
+
+	angleline = angleline*0.0174533;
+	linea = tan(angleline)*width;
+		
+	for(int k = 0; k < width; k++)
+    	{
+   		for(int l = 0; l < linea; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, k, l, pixel2);
+                }
+        }
+	for(int k = 0; k < width; k++)
+    	{
+   		for(int l = height-linea; l < height; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, k, l, pixel2);
+                }
+        }
+	for(int k = 0; k < height; k++)
+    	{
+   		for(int l = 0; l < linea; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, l, k, pixel2);
+                }
+        }
+	for(int k = 0; k < height; k++)
+    	{
+   		for(int l = width-linea; l < width; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, l, k, pixel2);
+                }
+        }
+
+//ENLEVER LES PIXELS NOIRS DU HAUT
 	//rotate while no line found
-	printf(" trouvéé " );
+	printf(" linea = %.2lf\n    angleline =  %d ", linea,angleline);
 SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
 //save
 
