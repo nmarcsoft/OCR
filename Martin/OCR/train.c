@@ -5,7 +5,7 @@
 #include "mnist_file.h"
 #include "nn.h"
 
-#define EPOCH 5000
+#define EPOCH 30000
 //#define EPOCH 10
 #define BATCH_SIZE 100
 
@@ -14,7 +14,7 @@ float tscale(float x){
     return x / 255.0f;
 }
 
-int tresize(float x){
+uint8_t tresize(float x){
     if(x != 0){
         return 1;
     }
@@ -29,8 +29,8 @@ const char *test_images_file = "data/t10k-images-idx3-ubyte";
 const char *test_labels_file = "data/t10k-labels-idx1-ubyte";
 
 void resize_data(mnist_image_t *image){
-    for(int j = 0; j < image_size; j++){
-        tresize(tscale(image->pixels[j]));
+    for(int j = 0; j < 784; j++){
+        image->pixels[j] = tresize(tscale(image->pixels[j]));
     }
 }
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
         resize_data(&train_dataset->images[i]);
     }
     size_dataset = find_size(test_dataset);
-    for(int k = 0; size_dataset; k++){
+    for(int k = 0; k < size_dataset; k++){
         resize_data(&test_dataset->images[k]);
     }
     int batches = train_dataset->size / BATCH_SIZE;

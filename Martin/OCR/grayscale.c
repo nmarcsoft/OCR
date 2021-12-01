@@ -64,11 +64,11 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	   SDL_GetRGB(pixel, image_surface->format, &r, &b, &b);
 	   if (r > 127)
 	   {
-	     *(histo+ (i*width +j)) = 0;
+	     *(histo+ (i*width +j)) = 1;
 	   }
 	   else
 	    {
-	     *(histo + (i*width + j)) = 1;
+	     *(histo + (i*width + j)) = 0;
 	    }
 	 }
 	}
@@ -219,8 +219,8 @@ int main(){
     //PREDICT
     int predict = 0;
     float activations[MNIST_LABELS], max_activations;
-    hypothesis(&test_dataset->images[0], &network, activations);
-    //hypothesis_real(histo, &network, activations);
+    //hypothesis(&test_dataset->images[0], &network, activations);
+    hypothesis_real(histo, &network, activations);
     max_activations = activations[0];
         for(int z = 0; z < 10; z++){
 		printf("%f ", activations[z]);

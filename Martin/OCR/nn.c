@@ -71,14 +71,14 @@ void hypothesis(mnist_image_t *image, neural_network_t *network, float activatio
         activations[i] = network->bias[i];
         for (int j = 0; j < image_size; j++) {
             activations[i] += (network->weights[i][j] * image->pixels[j]);
-//	    printf("%d ", resize(scale(image->pixels[j])));
+//	    printf("%d ", image->pixels[j]);
 //	    if(j % 28 == 0){
 //	    	printf("\n");
 //		}
         }
     }
   //  printf("\n");
-    //printf("\n");
+   // printf("\n");
     neural_network_softmax(activations, MNIST_LABELS);
 }
 
