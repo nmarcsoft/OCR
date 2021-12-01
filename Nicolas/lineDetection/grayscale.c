@@ -33,12 +33,12 @@ void copySurface(int * from, SDL_Surface* to, int width, int height)
 	    {
 	    	if (*(from + (i*width+j)) == 1)
 		{
-		  pixel = SDL_MapRGB(to->format, 1, 1, 1);
+		  pixel = SDL_MapRGB(to->format, 255, 255, 255);
 		  put_pixel(to, j, i, pixel);
 		}
 		else
 		{
-		  pixel = SDL_MapRGB(to->format, 1, 1, 1);
+		  pixel = SDL_MapRGB(to->format, 0, 0, 0);
 		  put_pixel(to, j, i, pixel);
 		}
 	    }
@@ -261,7 +261,19 @@ int * Rogne(int * toPrint, int x, int y, int width, int height)
 		}
 		j++;
 	}
-
+	int i = 0;
+	while (i < height)
+	{
+		if (*(toPrint + (i * width)) == 0)
+		{
+		for (int j = 0; j < width; j++)
+		{
+			*(toPrint+((i*width)+j)) = 1;
+		}
+		}
+		i++;
+	}
+	printf("\n%d", width);
 	return toPrint;
 
 }
@@ -285,6 +297,7 @@ void DoneAll(int * histo, int * coord, int width, int height)
 	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
 	printf("x = %d ; y = %d", j, i);
 	toPrint = Rogne(toPrint, j, i, widthReal/9, heightReal/9);
+	copySurface(toPrint, load_image("out.bmp"), widthReal/9, heightReal/9);
 			Stop++;
 			j+=widthReal/9;
 			}
