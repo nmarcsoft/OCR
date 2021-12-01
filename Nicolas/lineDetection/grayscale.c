@@ -156,12 +156,10 @@ int * getCase(int * histo, int width, int height, int * coord, int size, int num
 	{
 	    for (int j = 0; j < toGoW; j++)
 	    {
-//	printf("coord j = %d ", (j + *coord));
 		if (*(histo + ((i * width + j))) != 0 && *(histo + ((i * width + j))) != 1)
 		{
 			printf("DICK");
 		}
-	//printf("limitTest (10000) = %d\n",/*((i + *(coord+1) * toGoW) + j + *(coord)));*/*(histo+((i * width + j))));
 	    	*(Case+(i * toGoW + j)) = *(histo + (toGet + ((i + *(coord+1)) * width + j + *coord))); 
 		printf("VALUE = %d\n",*(Case+(i * toGoW + j))); 
 		cpt++;
@@ -169,12 +167,6 @@ int * getCase(int * histo, int width, int height, int * coord, int size, int num
 	}
 	printf("%d", cpt);
 	return Case;
-	/*
-	int get = 0;
-	while (i < height && !get)
-	{
-		while (
-*/
 }
 
 int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
@@ -239,19 +231,39 @@ int Height(int * histo, int coordY, int width)
 	}
 	return i;
 }
-void cut(int * histo, int i, int j, int widthR, int heightR, int width)
+
+int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a)
 {
-	int *toPrint = (int*) malloc((widthR/9*heightR/9) * sizeof(int));
 	for (int k = 0; k < heightR/9; k++)
 	{
 		for (int l = 0; l < widthR/9; l++)
 		{
-			*(toPrint + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
+*(a + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
 		}
 	}
 	printf("CALL");
-	printMatrix(toPrint, widthR/9, heightR/9);
 	printf("Done");
+	return a;
+}
+
+int * Rogne(int * toPrint, int x, int y, int width, int height)
+{
+	printf("In, x = %d ; y = %d ; maxX = %d ; maxY = %d\n", x, y, width, height);
+	int j = 0;
+	int getted = 0;
+	while (j < width)
+	{
+		if (*(toPrint + (j)) == 0)
+		{
+			for (int i = 0; i < height; i++){
+				*(toPrint+(i * width + j)) = 1;
+			}
+		}
+		j++;
+	}
+
+	return toPrint;
+
 }
 
 void DoneAll(int * histo, int * coord, int width, int height)
@@ -261,6 +273,7 @@ void DoneAll(int * histo, int * coord, int width, int height)
 	printf("RealW = %d\n", widthReal);
 	int heightReal = Height(histo, *coord+1, width);
 	heightReal = 1000;
+	int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int)); 
 	printf("WeightR = %d\n", heightReal);
 	int Stop = 0;
 	for (int i = *(coord+1); i < heightReal; i++)
@@ -269,15 +282,19 @@ void DoneAll(int * histo, int * coord, int width, int height)
 		{
 			if (*(histo + (i * widthReal + j)) == 1)
 			{
-			cut(histo, i, j, widthReal, heightReal, width);
+	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
+	printf("x = %d ; y = %d", j, i);
+	toPrint = Rogne(toPrint, j, i, widthReal/9, heightReal/9);
 			Stop++;
+			j+=widthReal/9;
 			}
-			if (Stop == 1)
+			if (Stop == 9)
 			{
+			printMatrix(toPrint, widthReal/9, heightReal/9);
 			break;
 			}
 		}
-		if (Stop == 1)
+		if (Stop == 9)
 		{
 		break;
 		}
