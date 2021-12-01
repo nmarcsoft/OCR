@@ -154,34 +154,34 @@ int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 
 
     
-int main()                                                                       
-{                                                                                  
-                                                                                   
-    SDL_Surface* image_surface;                                                    
-    SDL_Surface* screen_surface;                                                                                                                    
-    init_sdl();                                                                 
-    image_surface = load_image("images/image_02.jpeg");                         
-    screen_surface = display_image(image_surface);                              
+int main()                                                                     
+{                                                                              
+                                                                               
+    SDL_Surface* image_surface;                                                
+    SDL_Surface* screen_surface;                                               
+    init_sdl();                                                                
+    image_surface = load_image("images/image01rot.jpg");                        
+    screen_surface = display_image(image_surface);                             
                                                                    
-    int width = image_surface->w;                                               
-    int height = image_surface->h;                                              
-    float zoom = 0;                                                                 
+    int width = image_surface->w;                                              
+    int height = image_surface->h;                                             
+    float zoom = 0;                                                            
     float w = image_surface->w;                                                
     float h = image_surface->h;                                                
-    float mid = 0; 
-    int min_gray =0;            
-    SDL_FillRect(screen_surface, NULL, SDL_MapRGB                               
-    (screen_surface->format, 255, 255, 255));                                   
-                                                                                                                                        
-    if(height > width)                                                          
-    {                                                                           
-	zoom = 1000/h;                                                          
-    }                                                                           
-    else                                                                        
-    {                                                                           
-	zoom = 1000/w;                                                          
+    float mid = 0;
+    int min_gray =0;         
+    SDL_FillRect(screen_surface, NULL, SDL_MapRGB                              
+    (screen_surface->format, 255, 255, 255));                                  
+                                                                               
+    if(height > width)                                                         
+    {                                                                          
+	zoom = 1000/h;                                                         
+    }                                                                          
+    else                                                                       
+    {                                                                          
+	zoom = 1000/w;                                                        
     }   
-//1000x1000 window                                                                     
+//1000x1000 window                                            
 SDL_SaveBMP(rotozoomSurface(image_surface,0,zoom,1),"image3.bmp");
 image_surface = load_image("image3.bmp");
      screen_surface = display_image(image_surface);
@@ -194,7 +194,7 @@ image_surface = load_image("image3.bmp");
      (screen_surface->format, 255, 255, 255));
 
                                                   
-update_surface(screen_surface,image_surface);                                   
+update_surface(screen_surface,image_surface);                               
 wait_for_keypressed();
  
     for(int x = 0; x < width; x++)
@@ -344,11 +344,11 @@ for (int tempw = 0; tempw < width; tempw+=25)
         SDL_GetRGB(pixelyp, image_surface -> format, &rp, &gp, &bp);
 	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
 	image_surface = load_image("image3.bmp");                         
-	screen_surface = display_image(image_surface);                              
-                                                                                
-	width = image_surface->w;                                               
+	screen_surface = display_image(image_surface);                         
+                                                                               
+	width = image_surface->w;                                              
 	height = image_surface->h;                       
-	SDL_FillRect(screen_surface, NULL, SDL_MapRGB                               
+	SDL_FillRect(screen_surface, NULL, SDL_MapRGB              
 	(screen_surface->format, 255, 255, 255));                            
 	for(int cpt =0;cpt<3;cpt++)
 	{
@@ -444,19 +444,18 @@ for (int tempw = 0; tempw < width; tempw+=25)
 		if(r == 0){black = 1;}	
 	}
 	//Waiting for one black pixel
-	
+	int angleline = 0;
 	 while(!(lignedroite(image_surface,x,y,0)))
          {	
+		angle += 1;
 		printf("      %d       ",x);
 		y = height/2;
-		SDL_SaveBMP(rotozoomSurface(image_surface,1,1,1),"image3.bmp");	                                                             
-		image_surface = load_image("image3.bmp");                         
-		screen_surface = display_image(image_surface);                              
-        	if(lignedroite(image_surface,x,y,0)){printf("  wtfff???  ");}                                                                        
-		width = image_surface->w;                                               
+		SDL_SaveBMP(rotozoomSurface(image_surface,1,1,1),"image3.bmp");
+		image_surface = load_image("image3.bmp");                      
+		screen_surface = display_image(image_surface);             
+        	if(lignedroite(image_surface,x,y,0)){printf("  wtfff???  ");} 
+		width = image_surface->w;                                      
 		height = image_surface->h;                       
-		SDL_FillRect(screen_surface, NULL, SDL_MapRGB                               
-		(screen_surface->format, 255,255, 255));                            
 		Uint32 pixel = get_pixel(image_surface, x, y);
                 SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
 		if(r != 0)
@@ -492,6 +491,7 @@ for (int tempw = 0; tempw < width; tempw+=25)
 		}
 		
 	}	
+	//ENLEVER LES PIXELS NOIRS DU HAUT
 	//rotate while no line found
 	printf(" trouvéé " );
 SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
