@@ -43,8 +43,7 @@ void copySurface(int * from, SDL_Surface* to, int width, int height)
 		}
 	    }
 	}
-	SDL_SaveBMP(to, "out.bmp");
-	printf("Saved");
+	SDL_SaveBMP(to, "new.bmp");
 }
 
 SDL_Surface* display_image(SDL_Surface *img)
@@ -189,6 +188,7 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	    }
 	 }
 	}
+	printf("%d ", *(histo + (943 * width + 500)));
 	return histo;
 }
 
@@ -234,6 +234,7 @@ int Height(int * histo, int coordY, int width)
 
 int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a)
 {
+	printf("CALL");
 	for (int k = 0; k < heightR/9; k++)
 	{
 		for (int l = 0; l < widthR/9; l++)
@@ -241,14 +242,12 @@ int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a
 *(a + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
 		}
 	}
-	printf("CALL");
 	printf("Done");
 	return a;
 }
 
-int * Rogne(int * toPrint, int x, int y, int width, int height)
+int Rogne(int * toPrint, int x, int y, int width, int height)
 {
-	printf("In, x = %d ; y = %d ; maxX = %d ; maxY = %d\n", x, y, width, height);
 	int j = 0;
 	int getted = 0;
 	while (j < width)
@@ -273,13 +272,13 @@ int * Rogne(int * toPrint, int x, int y, int width, int height)
 		}
 		i++;
 	}
-	printf("\n%d", width);
-	return toPrint;
-
+	//return toPrint;
+	return i;
 }
 
 void DoneAll(int * histo, int * coord, int width, int height)
 {
+	int y = 0;
 	int widthReal = Width(histo, *coord, width);
 	widthReal = 1000;
 	printf("RealW = %d\n", widthReal);
@@ -294,23 +293,24 @@ void DoneAll(int * histo, int * coord, int width, int height)
 		{
 			if (*(histo + (i * widthReal + j)) == 1)
 			{
+	printf("BEFORE CUT : j = %d; j = %d\n", i , j);
 	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
-	printf("x = %d ; y = %d", j, i);
-	toPrint = Rogne(toPrint, j, i, widthReal/9, heightReal/9);
-	copySurface(toPrint, load_image("out.bmp"), widthReal/9, heightReal/9);
+	/*toPrint = */y = Rogne(toPrint, j, i, widthReal/9, heightReal/9);
+	copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
 			Stop++;
 			j+=widthReal/9;
 			}
-			if (Stop == 9)
-			{
-			printMatrix(toPrint, widthReal/9, heightReal/9);
-			break;
 			}
-		}
-		if (Stop == 9)
-		{
-		break;
-		}
+			if (Stop % 9 == 0)
+			{
+			i+=y;
+			//printf("\n%d should be < thant %d", i, heightReal);
+			if (Stop == 72)
+			{
+				i = *(coord+1) + (heightReal - heightReal/9) -1;
+			}
+			}
+	
 	}
 }
 
@@ -320,7 +320,7 @@ int main()
 {
     SDL_Surface* image_surface;
     init_sdl();
-    image_surface = load_image("imagemodif3.bmp");
+    image_surface = load_image("imagemodif2.bmp");
     // VARIABLES :
     int width = image_surface->w;
     int height = image_surface->h;
