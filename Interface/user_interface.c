@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <gtk/gtkx.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +15,7 @@ typedef struct UserInterface
   GtkWidget* image;              //the image gtk will display, it is the same that we will apply ocr on
 
 } UserInterface;
+
 
 // Signal handler for the "clicked" signal of the buttons.
 void on_open(GtkButton *button,gpointer ui)
@@ -87,7 +89,7 @@ void on_resolve(GtkButton *button, gpointer ui)
 }*/
 
 // Main function.
-int main(void)
+int main()
 {
     // Initializes GTK.
     gtk_init(NULL, NULL);
@@ -107,6 +109,7 @@ int main(void)
     // Gets the widgets.
     GtkWindow* window = GTK_WINDOW(gtk_builder_get_object(builder, "org.gtk.OCR"));
 
+
     GtkButton* open_button = GTK_BUTTON(gtk_builder_get_object(builder, "open_button"));
     GtkButton* close_button = GTK_BUTTON(gtk_builder_get_object(builder, "close_button"));
     GtkButton* resolve_button = GTK_BUTTON(gtk_builder_get_object(builder, "resolve_button"));
@@ -118,7 +121,7 @@ int main(void)
 
     gtk_file_filter_add_pixbuf_formats(filter);
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_dialog),filter);
-
+    
 
     UserInterface ui=
       {
@@ -134,10 +137,8 @@ int main(void)
     // Connects signal handlers.
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(open_button, "clicked", G_CALLBACK(on_open), &ui);
-    g_signal_connect(close_button, "clicked", G_CALLBACK(on_close), &ui);
     g_signal_connect(quit_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
     //g_signal_connect(resolve_button, "clicked", G_CALLBACK(on_resolve), &ui);
-
     // Runs the main loop.
     gtk_main();
 
