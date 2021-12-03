@@ -108,6 +108,32 @@ int lignedroite (SDL_Surface* image_surface,int i,int j,int toreturn)
 }
 //Straight line
 
+
+int lignehorizon (SDL_Surface* image_surface,int i,int j,int toreturn)
+{
+	if(toreturn>80)
+	{
+		return 1;
+	}
+	else
+	{
+		Uint32 pixel1 = get_pixel(image_surface,i+1,j);
+	        Uint8 r1, g1, b1;
+	        SDL_GetRGB(pixel1, image_surface->format,
+		                                       &r1, &g1, &b1);
+		if(r1 == 0)
+		{
+			return lignehorizon(image_surface,i+1,j,toreturn+1);
+		}
+		else
+		{
+			return 0;
+		}
+
+	}
+}
+
+
 int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 {
 	if(toreturn>40)
@@ -160,8 +186,8 @@ int main()
     SDL_Surface* image_surface;                                                
     SDL_Surface* screen_surface;                                               
     init_sdl();                                                                
-    image_surface = load_image("images/image_04.jpeg");      
-    //image_surface = load_image("images/image01rot.jpg");                        
+    //image_surface = load_image("images/image_04.jpeg");      
+    image_surface = load_image("images/image01rot.jpg");                        
     screen_surface = display_image(image_surface);                             
                                                                    
     int width = image_surface->w;                                              
@@ -173,7 +199,10 @@ int main()
     int min_gray =0;         
     SDL_FillRect(screen_surface, NULL, SDL_MapRGB                              
     (screen_surface->format, 255, 255, 255));                                  
-                                                                               
+                                                       
+update_surface(screen_surface,image_surface);                               
+wait_for_keypressed();
+                                                                           
     if(height > width)                                                         
     {                                                                          
 	zoom = 1000/h;                                                         
@@ -215,56 +244,8 @@ wait_for_keypressed();
        }
     }
 //grayscale
+update_surface(screen_surface,image_surface);
 wait_for_keypressed();
-/*
-for(int x = 1; x < width-1; x++)
-    {
-        for(int y = 1; y < height-1;y++)
-        {
-Uint32 pixel = get_pixel(image_surface,x,y);
-            Uint8 r, g, b;
-            SDL_GetRGB(pixel, image_surface->format,
-                                       &r, &g, &b);
-Uint32 pixel1 = get_pixel(image_surface,x-1,y-1);
-            Uint8 r1, g1, b1;
-            SDL_GetRGB(pixel1, image_surface->format,
-                                       &r1, &g1, &b1);
-Uint32 pixel2 = get_pixel(image_surface,x-1,y);
-            Uint8 r2, g2, b2;
-            SDL_GetRGB(pixel2, image_surface->format,
-                                       &r2, &g2, &b2);
-Uint32 pixel3 = get_pixel(image_surface,x-1,y+1);
-            Uint8 r3, g3, b3;
-            SDL_GetRGB(pixel3, image_surface->format,
-                                       &r3, &g3, &b3);
-Uint32 pixel4 = get_pixel(image_surface,x,y-1);
-            Uint8 r4, g4, b4;
-            SDL_GetRGB(pixel4, image_surface->format,
-                                       &r4, &g4, &b4);
-Uint32 pixel5 = get_pixel(image_surface,x,y+1);
-            Uint8 r5, g5, b5;
-            SDL_GetRGB(pixel5, image_surface->format,
-                                       &r5, &g5, &b5);
-Uint32 pixel6 = get_pixel(image_surface,x+1,y-1);
-            Uint8 r6, g6, b6;
-            SDL_GetRGB(pixel6, image_surface->format,
-                                       &r6, &g6, &b6);
-Uint32 pixel7 = get_pixel(image_surface,x+1,y);
-            Uint8 r7, g7, b7;
-            SDL_GetRGB(pixel7, image_surface->format,
-                                       &r7, &g7, &b7);
-Uint32 pixel8 = get_pixel(image_surface,x+1,y+1);
-            Uint8 r8, g8, b8;
-            SDL_GetRGB(pixel8, image_surface->format,
-                                       &r8, &g8, &b8);
-	float rtot = (r+r1+r2+r3+r4+r5+r6+r7+r8)/9;
-		Uint32 pixeltmp = SDL_MapRGB
-                (image_surface->format, rtot, rtot, rtot);
-                put_pixel(image_surface, x, y, pixeltmp);
-		}
-}
-
-*/
 
 for(int x = 1; x < width-1; x++)
     {
@@ -333,8 +314,11 @@ Uint32 pixel8 = get_pixel(image_surface,x+1,y+1);
                 put_pixel(image_surface, x, y, pixeltmp);
 		}
 }
-
-
+//Median Filter
+                                                  
+update_surface(screen_surface,image_surface);                               
+wait_for_keypressed();
+ 
 for(int x = 0; x < width; x++)
     {
        for(int y = 0; y < height;y++)
@@ -342,7 +326,7 @@ for(int x = 0; x < width; x++)
          Uint32 pixel = get_pixel(image_surface, x, y);
          Uint8 r, g, b;
          SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
-	 Uint8 c = f(r,6);	
+	 Uint8 c = f(r,2);	
 	 Uint32 pixelco = SDL_MapRGB(image_surface->format, c, c, c);
 	 put_pixel(image_surface, x, y, pixelco);
 	}
@@ -419,7 +403,10 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	tottemp = 0;
 }
 //Binarisation
-
+                                                  
+update_surface(screen_surface,image_surface);                               
+wait_for_keypressed();
+ 
 	for(int k = 0; k <= width-1; k+=width)
     	{
    		for(int l = 0; l <= height-1; l++)
@@ -439,10 +426,6 @@ for (int tempw = 0; tempw < width; tempw+=25)
                 }
         }
 //white line around the window
-
-
-    update_surface(screen_surface,image_surface);
-    wait_for_keypressed();
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_WM_SetCaption("Type 'a' to save, anything to rotate", NULL);
@@ -540,7 +523,11 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	                put_pixel(image_surface, x, y, pixeltmp);
 			}
 }}}
+                                                  
+update_surface(screen_surface,image_surface);                               
+wait_for_keypressed();
 //Noise suppression
+
 	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
         image_surface = load_image("image3.bmp");
         screen_surface = display_image(image_surface);
@@ -563,6 +550,7 @@ for (int tempw = 0; tempw < width; tempw+=25)
 		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
 		if(r == 0){black = 1;}	
 	}
+
 	//Waiting for one black pixel
 	double angleline = 0;
 	double linea = 0;
@@ -611,8 +599,8 @@ for (int tempw = 0; tempw < width; tempw+=25)
 			}//adjust if the rotation loose the line
 		}
 		
+	printf("%d",x);
 	}	
-
 	angleline = angleline*0.0174533;
 	linea = tan(angleline)*width;
 		
@@ -652,14 +640,14 @@ for (int tempw = 0; tempw < width; tempw+=25)
                         put_pixel(image_surface, l, k, pixel2);
                 }
         }
+	//Black rotation -> white
 
-//ENLEVER LES PIXELS NOIRS DU HAUT
 	//rotate while no line found
-	printf(" linea = %.2lf\n    angleline =  %d ", linea,angleline);
 SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
 //save
-
-update_surface(screen_surface, image_surface);
+                                                  
+update_surface(screen_surface,image_surface);                               
+wait_for_keypressed();
 SDL_FreeSurface(image_surface);
 SDL_FreeSurface(screen_surface);
 void SDL_FreeSurface(SDL_Surface *surface);
