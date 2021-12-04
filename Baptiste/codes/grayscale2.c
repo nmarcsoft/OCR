@@ -76,8 +76,7 @@ void wait_for_keypressed()
 
 void copySurface(int * from, SDL_Surface* to, int width, int height)
 {
-        printf(" copy  ");
-	Uint32 pixel;
+        Uint32 pixel;
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
@@ -95,7 +94,6 @@ void copySurface(int * from, SDL_Surface* to, int width, int height)
             }
         }
         SDL_SaveBMP(to, "new.bmp");
-	printf("copy \n");
 }
 
 
@@ -144,10 +142,24 @@ int * DetectStart(int * histo, int width, int height, int * coord)
                   }
            i+=5;
         }
-        *coord = ReturnX+5;
+        *coord = ReturnX;
         *(coord+1) = ReturnY;
+        int added = 0;
+        while (*(histo + (*(coord+1) * width + *coord)) == 1 && added < 5)
+        {
+                *(coord) = *(coord) + 1;
+                added++;
+        }
+        added = 0;
+        while (*(histo + (*(coord + 1) * width + *coord)) == 1 && added < 5)
+        {
+                *(coord + 1) = *(coord+1) + 1;
+                added++;
+        }
+        perfectStart(coord, histo, width);
         return coord;
     }
+
 
 
 int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
@@ -179,19 +191,23 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 int Width(int * histo, int * coord, int width)
 {
         int x = *coord;
-        int y = *(coord+1) + 5;
+        int y = *(coord+1);
         int toReturn = 0;
         while (x < width-5)
         {
         toReturn = 0;
         for (int i = 0; i < 5; i++)
         {
-        if (*(histo + ((y * width) + (i+x))) == 0)
-        {
+
+
+          if (*(histo + ((y * width) + (i+x))) == 0)
+          {
                 toReturn++;
+          }
         }
-        }
-        if (toReturn >= 4)
+
+
+        if (toReturn >= 2)
         {
                 x+=5;
         }
@@ -201,10 +217,7 @@ int Width(int * histo, int * coord, int width)
         }
         }
         //printf("debug width x = %d ; y = %d, value = %d, width = %d", x, y, *(histo + (x * width + y)), width);
-        while ((*(histo + (x * width + y)) == 0) && x < width)
-        {
-        x++;}
-        return (x - (*coord));
+        return (x - (*(coord)));
 }
 
 int Height(int * histo, int * coord, int height)
@@ -239,21 +252,44 @@ int Height(int * histo, int * coord, int height)
 
 int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a)
 {
-//      printf("CALL");
+      printf("x = %d , y = %d \n",j,i);
         for (int k = 0; k < heightR/9; k++)
         {
                 for (int l = 0; l < widthR/9; l++)
                 {
-*(a + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
+*(a + (k * (widthR/9) + l)) = *(histo + (((i + k) * width) + (j + l)));
                 }
         }
-//      printf("Done");
         return a;
 }
 
-
 int Rogne(int * toPrint, int width, int height)
-{ for (int y = 0; y < height; y++)
+{
+        /*while (j < width)
+        {
+                if (*(toPrint + (j)) == 0)
+                {
+                        for (int i = 0; i < height; i++){
+                                *(toPrint+(i * width + j)) = 1;
+                        }
+                }
+                j++;
+        }
+        int i = 0;
+        while (i < height)
+        {
+                if (*(toPrint + (i * width)) == 0)
+                {
+                for (int j = 0; j < width; j++)
+                {
+                        *(toPrint+((i*width)+j)) = 1;
+                }
+                }
+                i++;
+        }
+        //return toPrint;
+        return i;*/
+        for (int y = 0; y < height; y++)
         {
                 for (int x = 0; x < 10; x++)
                 {
@@ -269,12 +305,12 @@ int Rogne(int * toPrint, int width, int height)
         }
         for (int y = 0; y < height; y++)
         {
-                for (int x = 60; x < width; x++)
+                for (int x = 58; x < width; x++)
                 {
                 *(toPrint + (y * width + x)) = 1;
                 }
         }
-        for (int y = 80; y < height; y++)
+        for (int y = 62; y < height; y++)
         {
                 for (int x = 0; x < width; x++)
                 {
@@ -284,49 +320,73 @@ int Rogne(int * toPrint, int width, int height)
         return height;
 }
 
+
+void perfectStart(int * coord, int * histo, int width)
+{
+        int x = *coord;
+        int y = *(coord+1);
+        while (*(histo+(y * width + x)) == 0)
+        {
+                for (int i = 0; i < width; i++)
+                {
+                        if (*(histo+ (y * width + (x + i))) == 0)
+                        {
+                                if (i < 20)
+                                {
+                                        x = i;
+                                }
+                        }
+                }
+                y++;
+        }
+}
+
 void DoneAll(int * histo, int * coord, int width, int height)
 {
         int y = 0;
         int widthReal = Width(histo, coord, width);
         int heightReal = Height(histo, coord, height);
+        printf("Height = %d, Width = %d", heightReal, widthReal);
         int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int));
         int Stop = 0;
-	printf("%d",  heightReal);
-        for (int i = *(coord+1); i < heightReal; i++)
+        int toStop = 54;
+        for (int i = *(coord+1); i < heightReal + *(coord + 1); i++)
         {
-                for (int j = *coord; j < widthReal; j++)
+                for (int j = *coord; j < widthReal + *coord; j++)
                 {
-			
+                        //printf("x = %d, y = %d\n", i, j);
                         if (*(histo + (i * widthReal + j)) == 1)
                         {
         //printf("BEFORE CUT : j = %d; j = %d\n", i , j);
         toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
+	printf(" %d ",Stop);
         /*toPrint = */y = Rogne(toPrint, widthReal/9, heightReal/9);
         //printMatrix(toPrint, 88, 88);
-        
-printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
+        copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
                         Stop++;
-                        j+=widthReal/9;
+                        j+=(widthReal/9)-1;
+                        }
+                        if (Stop == toStop)
+                        {
+                        break;
                         }
                         if (Stop % 9 == 0)
                         {
-                        i+=y-1;
-                        //printf("\n%d should be < thant %d", i, heightReal);
-                        if (Stop == 72)
-                        {
-                                i = *(coord+1) + (heightReal - heightReal/9) -1;
+                                i+=(heightReal/9)-1;
+                                j = *coord;
+                                //printf("\n%d should be < thant %d", i, heightReal);
+                                if (Stop == 72)
+                                {
+                                        i = *(coord+1) + (heightReal - heightReal/9) -1;
+                                }
                         }
-                        }
-                        }
+                }
+                if (Stop == toStop)
+                {
+                        break;
+                }
         }
 }
-
-
-
-
-
-
 Uint8 f(Uint8 c, double n)
 {
     if(c <= 255 / 2)
