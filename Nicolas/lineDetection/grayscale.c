@@ -96,13 +96,12 @@ int * DetectStart(int * histo, int width, int height, int * coord)
 	int line = 0;
 	int ReturnX = 0;
 	int ReturnY = 0;
-        while (i < height-10 && !line)
+        while (i < height-10 && line == 0)
 	{
 	   ReturnY = i;
 	   j = 0;
-	   ReturnX = j;
 	   tot = 0;
-	   while (j < width - 10 && !line)
+	   while (j < width - 10 && line == 0)
 	   {
 	   cpt = 0;
 		// Check on a square of 10px x 10px
@@ -118,25 +117,26 @@ int * DetectStart(int * histo, int width, int height, int * coord)
 			    
 		    }
 		}
-		// If their is more than 70 black pixel, add line
-		if (cpt >= 20)
+	// If their is more than 70 black pixel, add line
+		if (cpt >= 10)
 		{
 			tot += 1;
 			if (tot >= 50)
 			{
 				line = 1;
+	   			ReturnX = j - 50*5;
+				break;
 			}
-			cpt = 0;
 		}
-		j+=10;
-	  }
-	   i+=10;
+		j+=5;
+		  }
+	   i+=5;
 	}
-	*coord = ReturnX;
+	*coord = ReturnX+5;
 	*(coord+1) = ReturnY;
 	return coord;
     }
-
+/*
 int * getCase(int * histo, int width, int height, int * coord, int size, int num, int * Case)
 {
 	if (*coord == 0)
@@ -166,7 +166,7 @@ int * getCase(int * histo, int width, int height, int * coord, int size, int num
 	}
 	printf("%d", cpt);
 	return Case;
-}
+}*/
 
 int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
 {
@@ -177,7 +177,7 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	 for (int j = 0; j < width; j++)
 	 {
 	   pixel = get_pixel(image_surface, j, i);
-	   SDL_GetRGB(pixel, image_surface->format, &r, &b, &b);
+	   SDL_GetRGB(pixel, image_surface->format, &r, &b, &g);
 	   if (r > 127)
 	   {
 	     *(histo+ (i*width +j)) = 1;
@@ -188,7 +188,7 @@ int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int he
 	    }
 	 }
 	}
-	printf("%d ", *(histo + (943 * width + 500)));
+	//printf("%d ", *(histo + (943 * width + 500)));
 	return histo;
 }
 
@@ -212,29 +212,69 @@ void printMatrix(int* a, int height, int width)
    printf("\n\n");
 }
 
-int Width(int * histo, int coordX, int width)
+int Width(int * histo, int * coord, int width)
 {
-	int i = coordX;
-	while (*(histo + i) == 0 && i < width)
+	int x = *coord;
+	int y = *(coord+1) + 5;
+	int toReturn = 0;
+	while (x < width-5)
 	{
-		i++;
+	toReturn = 0;
+	for (int i = 0; i < 5; i++)
+	{
+	if (*(histo + ((y * width) + (i+x))) == 0)
+	{
+		toReturn++;
 	}
-	return i;
+	}
+	if (toReturn >= 4)
+	{
+		x+=5;
+	}
+	else
+	{
+	    break;
+	}
+	}
+	//printf("debug width x = %d ; y = %d, value = %d, width = %d", x, y, *(histo + (x * width + y)), width);
+	while ((*(histo + (x * width + y)) == 0) && x < width)
+	{
+	x++;}
+	return (x - (*coord));
 }
 
-int Height(int * histo, int coordY, int width)
+int Height(int * histo, int * coord, int height)
 {
-	int i = coordY;
-	while (*(histo+(i*width)) == 0 && i < width)
+	int x = *coord;
+	int y = *(coord+1);
+	int toReturn = 0;
+	while (y < height-5)
 	{
-		i++;
+		toReturn = 0;
+		for (int i = 0; i < 5; i++)
+		{
+		if (*(histo + (((y+i) * height + x))) == 0)
+		{
+			toReturn++;
+		}
+		}
+		if (toReturn >= 2)
+		{
+			//printf("\nx = %d, y = %d, value = %d\n", x, y, (*(histo + (((y) * height + x)))));
+			y+=5;
+		}
+		else
+		{
+			break;
+		}
 	}
-	return i;
+	return (y - (*(coord+1)));
+
 }
 
 int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a)
 {
-	printf("CALL");
+//	printf("CALL");
 	for (int k = 0; k < heightR/9; k++)
 	{
 		for (int l = 0; l < widthR/9; l++)
@@ -242,15 +282,13 @@ int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a
 *(a + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
 		}
 	}
-	printf("Done");
+//	printf("Done");
 	return a;
 }
 
-int Rogne(int * toPrint, int x, int y, int width, int height)
+int Rogne(int * toPrint, int width, int height)
 {
-	int j = 0;
-	int getted = 0;
-	while (j < width)
+	/*while (j < width)
 	{
 		if (*(toPrint + (j)) == 0)
 		{
@@ -273,44 +311,70 @@ int Rogne(int * toPrint, int x, int y, int width, int height)
 		i++;
 	}
 	//return toPrint;
-	return i;
+	return i;*/
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < 10; x++)
+		{
+		*(toPrint + (y * width + x)) = 1;
+		}
+	}
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < 10; x++)
+		{
+		*(toPrint + (x * width + y)) = 1;
+		}
+	}	
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 60; x < width; x++)
+		{
+		*(toPrint + (y * width + x)) = 1;
+		}
+	}
+	for (int y = 80; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+		*(toPrint + (y * width + x)) = 1;
+		}
+	}
+	return height;
 }
 
 void DoneAll(int * histo, int * coord, int width, int height)
 {
 	int y = 0;
-	int widthReal = Width(histo, *coord, width);
-	widthReal = 1000;
-	printf("RealW = %d\n", widthReal);
-	int heightReal = Height(histo, *coord+1, width);
-	heightReal = 1000;
+	int widthReal = Width(histo, coord, width);
+	int heightReal = Height(histo, coord, height);
 	int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int)); 
-	printf("WeightR = %d\n", heightReal);
 	int Stop = 0;
 	for (int i = *(coord+1); i < heightReal; i++)
 	{
 		for (int j = *coord; j < widthReal; j++)
 		{
+		
 			if (*(histo + (i * widthReal + j)) == 1)
 			{
-	printf("BEFORE CUT : j = %d; j = %d\n", i , j);
+	//printf("BEFORE CUT : j = %d; j = %d\n", i , j);
 	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
-	/*toPrint = */y = Rogne(toPrint, j, i, widthReal/9, heightReal/9);
+	/*toPrint = */y = Rogne(toPrint, widthReal/9, heightReal/9);
+	//printMatrix(toPrint, 88, 88);
 	copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
 			Stop++;
 			j+=widthReal/9;
 			}
-			}
 			if (Stop % 9 == 0)
 			{
-			i+=y;
+			i+=y-1;
 			//printf("\n%d should be < thant %d", i, heightReal);
 			if (Stop == 72)
 			{
 				i = *(coord+1) + (heightReal - heightReal/9) -1;
 			}
 			}
-	
+			}
 	}
 }
 
@@ -324,12 +388,9 @@ int main()
     // VARIABLES :
     int width = image_surface->w;
     int height = image_surface->h;
-    int tmp = 0;
-    int endLine = 1;
     int size = width * height;
     int *histo = 0;
     histo = (int*) malloc(size * sizeof(int));
-    int *start;
     if (histo == NULL)
     {
      printf("Can't allocated memory");
@@ -338,7 +399,6 @@ int main()
     histo = initializeHisto(histo, image_surface, width, height);
    // printMatrix(histo, height, width);
     coord = DetectStart(histo, width, height, coord);
-    printf("Coord de départ : x -> %d, y -> %d\n", *coord, *(coord+1));
     //int * Case = 0; 
     //Case = (int*) malloc(size/81 * sizeof(int));
     //if (Case == NULL)
