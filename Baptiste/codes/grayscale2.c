@@ -265,30 +265,6 @@ int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a
 
 int Rogne(int * toPrint, int width, int height)
 {
-        /*while (j < width)
-        {
-                if (*(toPrint + (j)) == 0)
-                {
-                        for (int i = 0; i < height; i++){
-                                *(toPrint+(i * width + j)) = 1;
-                        }
-                }
-                j++;
-        }
-        int i = 0;
-        while (i < height)
-        {
-                if (*(toPrint + (i * width)) == 0)
-                {
-                for (int j = 0; j < width; j++)
-                {
-                        *(toPrint+((i*width)+j)) = 1;
-                }
-                }
-                i++;
-        }
-        //return toPrint;
-        return i;*/
         for (int y = 0; y < height; y++)
         {
                 for (int x = 0; x < 10; x++)
@@ -305,12 +281,12 @@ int Rogne(int * toPrint, int width, int height)
         }
         for (int y = 0; y < height; y++)
         {
-                for (int x = 58; x < width; x++)
+                for (int x = 70; x < width; x++)
                 {
                 *(toPrint + (y * width + x)) = 1;
                 }
         }
-        for (int y = 62; y < height; y++)
+        for (int y = 70; y < height; y++)
         {
                 for (int x = 0; x < width; x++)
                 {
@@ -349,37 +325,38 @@ void DoneAll(int * histo, int * coord, int width, int height)
         printf("Height = %d, Width = %d", heightReal, widthReal);
         int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int));
         int Stop = 0;
-        int toStop = 54;
-        for (int i = *(coord+1); i < heightReal + *(coord + 1); i++)
+        int toStop = 81;
+        for (int i = *(coord+1); i < heightReal + *(coord+1); i+=(heightReal/9))
         {
-                for (int j = *coord; j < widthReal + *coord; j++)
+
+        	if (Stop == 72)
+                {
+			printf("couille\n");
+                        i = *(coord+1) + (heightReal - heightReal/9) -1;
+                }
+         
+                for (int j = *coord; j < widthReal + (*coord)-20; j+=(widthReal/9))
                 {
                         //printf("x = %d, y = %d\n", i, j);
-                        if (*(histo + (i * widthReal + j)) == 1)
-                        {
+                        //if (*(histo + (i * widthReal + j)) == 0)
+                        //{
         //printf("BEFORE CUT : j = %d; j = %d\n", i , j);
-        toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
-	printf(" %d ",Stop);
+	printf(" %d ",Stop+1);
+	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
         /*toPrint = */y = Rogne(toPrint, widthReal/9, heightReal/9);
         //printMatrix(toPrint, 88, 88);
         copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
                         Stop++;
-                        j+=(widthReal/9)-1;
-                        }
+                        //}
                         if (Stop == toStop)
                         {
                         break;
                         }
-                        if (Stop % 9 == 0)
-                        {
-                                i+=(heightReal/9)-1;
-                                j = *coord;
-                                //printf("\n%d should be < thant %d", i, heightReal);
-                                if (Stop == 72)
+                                /*if (Stop == 72)
                                 {
+					printf("couille\n");
                                         i = *(coord+1) + (heightReal - heightReal/9) -1;
-                                }
-                        }
+                                }*/
                 }
                 if (Stop == toStop)
                 {
