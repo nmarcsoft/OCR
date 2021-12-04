@@ -14,7 +14,8 @@ typedef struct UserInterface
   GtkWidget* resolve_button;     //Resolving the sudoku
   GtkBuilder* builder;           //just to save the builder
   GtkWidget* file_dialog;        //widget to choose a file to open
-  GtkWidget* image;              //the image gtk will display, it is the same that we will apply ocr on
+  GtkWidget* image;  //the image gtk will display, it is the same that we will apply ocr on
+  GtkWidget* image_sol;
 } UserInterface;
 
 /*
@@ -45,8 +46,10 @@ void on_open(GtkWidget *button, gpointer ui)
           {
             gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
             //gtk_image_set_from_file(GTK_IMAGE(i->image),filename);
-            //int width = gtk_widget_get_allocated_width(taillefenetre); 
-            GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_scale(filename,500,500,TRUE, NULL);
+            /*
+            int width = gtk_widget_get_allocated_width(taillefenetre); 
+            int height = gtk_widget_get_allocated_height(taillefenetre);*/
+            GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_scale(filename,801,801,TRUE, NULL);
             gtk_image_set_from_pixbuf(GTK_IMAGE(i->image),pixbuf);
 
             gtk_widget_show(i->image);
@@ -120,16 +123,18 @@ int main()
     GtkFileFilter* filter = gtk_file_filter_new();
     GtkWidget* file_dialog = gtk_file_chooser_dialog_new("Open image",window,GTK_FILE_CHOOSER_ACTION_OPEN,"Open",GTK_RESPONSE_ACCEPT,"Cancel",GTK_RESPONSE_CANCEL,NULL);
     
+/*
+    GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file_at_scale("image_solve.png",801,801,TRUE, NULL);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(image_solve.png),pixbuf2);
+*/
+
     gtk_file_filter_add_pixbuf_formats(filter);
-    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_dialog),filter);
-    
-    
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_dialog),filter); 
     
     UserInterface ui=
       {
        .window = window,
        .open_button = open_button,
-       //.close_button = close_button,
        .quit_button = quit_button,
        .resolve_button = resolve_button,
        .file_dialog = file_dialog,
