@@ -18,6 +18,6 @@ clean:
 	${RM} *.o
 	${RM} *.d
 	${RM} display
-	${RM} grayscale
+	${RM} grayscale2
 
 # END
