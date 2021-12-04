@@ -2,6 +2,7 @@
 #include <err.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
+#include "segmentation.h"
 #include "pixel_operations.h"
 #include <SDL/SDL_rotozoom.h>
 #include <math.h>
@@ -72,6 +73,257 @@ void wait_for_keypressed()
         SDL_PollEvent(&event);
     } while(event.type != SDL_KEYUP);
 }
+
+void copySurface(int * from, SDL_Surface* to, int width, int height)
+{
+        printf(" copy  ");
+	Uint32 pixel;
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (*(from + (i*width+j)) == 1)
+                {
+                  pixel = SDL_MapRGB(to->format, 255, 255, 255);
+                  put_pixel(to, j, i, pixel);
+                }
+                else
+                {
+                  pixel = SDL_MapRGB(to->format, 0, 0, 0);
+                  put_pixel(to, j, i, pixel);
+                }
+            }
+        }
+        SDL_SaveBMP(to, "new.bmp");
+	printf("copy \n");
+}
+
+
+int * DetectStart(int * histo, int width, int height, int * coord)
+    {
+        int cpt = 0;
+        int tot = 0;
+        int i = 0;
+        int j = 0;
+        int line = 0;
+        int ReturnX = 0;
+        int ReturnY = 0;
+        while (i < height-10 && line == 0)
+        {
+           ReturnY = i;
+           j = 0;
+           tot = 0;
+           while (j < width - 10 && line == 0)
+           {
+           cpt = 0;
+                // Check on a square of 10px x 10px
+                for (int k = i; k < i + 5; k++)
+                {
+                    for (int l = j; l < j + 5; l++)
+                    {
+                            if ((*(histo+(k * width + l))) == 0)
+                            {
+
+                                    cpt += 1;
+                            }
+
+                    }
+                }
+        // If their is more than 70 black pixel, add line
+                if (cpt >= 10)
+                {
+                        tot += 1;
+                        if (tot >= 50)
+                        {
+                                line = 1;
+                                ReturnX = j - 50*5;
+                                break;
+                        }
+                }
+                j+=5;
+                  }
+           i+=5;
+        }
+        *coord = ReturnX+5;
+        *(coord+1) = ReturnY;
+        return coord;
+    }
+
+
+int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
+{
+        Uint32 pixel;
+        Uint8 r, b, g;
+        for (int i = 0; i < height; i++)
+        {
+         for (int j = 0; j < width; j++)
+         {
+           pixel = get_pixel(image_surface, j, i);
+           SDL_GetRGB(pixel, image_surface->format, &r, &b, &g);
+           if (r > 127)
+           {
+             *(histo+ (i*width +j)) = 1;
+           }
+           else
+            {
+             *(histo + (i*width + j)) = 0;
+            }
+         }
+        }
+        //printf("%d ", *(histo + (943 * width + 500)));
+        return histo;
+}
+
+
+
+int Width(int * histo, int * coord, int width)
+{
+        int x = *coord;
+        int y = *(coord+1) + 5;
+        int toReturn = 0;
+        while (x < width-5)
+        {
+        toReturn = 0;
+        for (int i = 0; i < 5; i++)
+        {
+        if (*(histo + ((y * width) + (i+x))) == 0)
+        {
+                toReturn++;
+        }
+        }
+        if (toReturn >= 4)
+        {
+                x+=5;
+        }
+        else
+        {
+            break;
+        }
+        }
+        //printf("debug width x = %d ; y = %d, value = %d, width = %d", x, y, *(histo + (x * width + y)), width);
+        while ((*(histo + (x * width + y)) == 0) && x < width)
+        {
+        x++;}
+        return (x - (*coord));
+}
+
+int Height(int * histo, int * coord, int height)
+{
+        int x = *coord;
+        int y = *(coord+1);
+        int toReturn = 0;
+        while (y < height-5)
+        {
+                toReturn = 0;
+                for (int i = 0; i < 5; i++)
+                {
+                if (*(histo + (((y+i) * height + x))) == 0)
+                {
+                        toReturn++;
+                }
+                }
+                if (toReturn >= 2)
+                {
+                        //printf("\nx = %d, y = %d, value = %d\n", x, y, (*(histo + (((y) * height + x)))));
+                        y+=5;
+                }
+                else
+                {
+                        break;
+                }
+        }
+        return (y - (*(coord+1)));
+
+}
+
+
+int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a)
+{
+//      printf("CALL");
+        for (int k = 0; k < heightR/9; k++)
+        {
+                for (int l = 0; l < widthR/9; l++)
+                {
+*(a + (k * (widthR/9) + l)) = *(histo + ((i + k) * width + (j + l)));
+                }
+        }
+//      printf("Done");
+        return a;
+}
+
+
+int Rogne(int * toPrint, int width, int height)
+{ for (int y = 0; y < height; y++)
+        {
+                for (int x = 0; x < 10; x++)
+                {
+                *(toPrint + (y * width + x)) = 1;
+                }
+        }
+        for (int y = 0; y < height; y++)
+        {
+                for (int x = 0; x < 10; x++)
+                {
+                *(toPrint + (x * width + y)) = 1;
+                }
+        }
+        for (int y = 0; y < height; y++)
+        {
+                for (int x = 60; x < width; x++)
+                {
+                *(toPrint + (y * width + x)) = 1;
+                }
+        }
+        for (int y = 80; y < height; y++)
+        {
+                for (int x = 0; x < width; x++)
+                {
+                *(toPrint + (y * width + x)) = 1;
+                }
+        }
+        return height;
+}
+
+void DoneAll(int * histo, int * coord, int width, int height)
+{
+        int y = 0;
+        int widthReal = Width(histo, coord, width);
+        int heightReal = Height(histo, coord, height);
+        int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int));
+        int Stop = 0;
+	printf("%d",  heightReal);
+        for (int i = *(coord+1); i < heightReal; i++)
+        {
+                for (int j = *coord; j < widthReal; j++)
+                {
+			
+                        if (*(histo + (i * widthReal + j)) == 1)
+                        {
+        //printf("BEFORE CUT : j = %d; j = %d\n", i , j);
+        toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
+        /*toPrint = */y = Rogne(toPrint, widthReal/9, heightReal/9);
+        //printMatrix(toPrint, 88, 88);
+        
+printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
+                        Stop++;
+                        j+=widthReal/9;
+                        }
+                        if (Stop % 9 == 0)
+                        {
+                        i+=y-1;
+                        //printf("\n%d should be < thant %d", i, heightReal);
+                        if (Stop == 72)
+                        {
+                                i = *(coord+1) + (heightReal - heightReal/9) -1;
+                        }
+                        }
+                        }
+        }
+}
+
+
+
 
 
 
@@ -180,14 +432,9 @@ int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 
 
     
-int main()                                                                     
+SDL_Surface* pretraitement(SDL_Surface* image_surface)                                                                     
 {                                                                              
-                                                                               
-    SDL_Surface* image_surface;                                                
-    init_sdl();                                                                
-    //image_surface = load_image("images/image_01.jpeg");      
-    image_surface = load_image("images/image01rot.jpg");                        
-                                                                   
+    
     int width = image_surface->w;                                              
     int height = image_surface->h;                                             
     float zoom = 0;                                                            
@@ -514,12 +761,14 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	//Waiting for one black pixel
 	double angleline = 0;
 	double linea = 0;
-	 while(!(lignedroite(image_surface,x,y,0)))
-         {	
+	int debug = 0;
+	while(!(lignedroite(image_surface,x,y,0)))
+         {
+		debug = 1;	
 		angleline += 1;
 		y = height/2;
 		SDL_SaveBMP(rotozoomSurface(image_surface,1,1,1),"image3.bmp");
-		image_surface = load_image("image3.bmp");                      
+		image_surface = load_image("image3.bmp");
 		width = image_surface->w;                                      
 		height = image_surface->h;                       
 		Uint32 pixel = get_pixel(image_surface, x, y);
@@ -552,11 +801,11 @@ for (int tempw = 0; tempw < width; tempw+=25)
    	        		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
 			}//adjust if the rotation loose the line
 		}
+
 		
 	}	
 	angleline = angleline*0.0174533;
 	linea = tan(angleline)*width;
-		
 	for(int k = 0; k < width; k++)
     	{
    		for(int l = 0; l < linea; l++)
@@ -596,11 +845,95 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	//Black rotation -> white
 	
 	//rotate while no line found
+if(debug == 0){
+SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");}
+else
+{
+printf("??");
+ SDL_SaveBMP(rotozoomSurface(image_surface,-1,1,1),"image3.bmp");
+ image_surface = load_image("image3.bmp");
+width = image_surface->w;
+height = image_surface->h;
+	for(int k = 0; k < 20; k++)
+    	{
+   		for(int l = 0; l < height; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, k, l, pixel2);
+                }
+        }//gauche
+	for(int k = width-20; k <width; k++)
+    	{
+   		for(int l = 0; l < height; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, k, l, pixel2);
+                }
+        }
+	for(int k = 0; k < 20; k++)
+    	{
+   		for(int l = 0; l < width; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, l, k, pixel2);
+                }
+        }
+	for(int k = height-20; k < height; k++)
+    	{
+   		for(int l = 0; l < width; l++)
+               	{
+                	Uint32 pixel2 = SDL_MapRGB
+                        (image_surface->format, 255, 255, 255);
+                        put_pixel(image_surface, l, k, pixel2);
+                }
+        }
+	
 SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
+}
 //save
                                                   
+    image_surface = load_image("image3.bmp");
+    // VARIABLES :
+    width = image_surface->w;
+    height = image_surface->h;
+    int size = width * height;
+    int *histo = 0;
+    histo = (int*) malloc(size * sizeof(int));
+    if (histo == NULL)
+    {
+     printf("Can't allocated memory");
+    }
+    int * coord = (int*) malloc(2 * sizeof(int));
+    histo = initializeHisto(histo, image_surface, width, height);
+   // printMatrix(histo, height, width);
+    coord = DetectStart(histo, width, height, coord);
+    //int * Case = 0;
+    //Case = (int*) malloc(size/81 * sizeof(int));
+    //if (Case == NULL)
+    //{
+//      printf("lineDetection : Can't allocated memory");
+  //  }
+    //Case = getCase(histo, width, height, coord, size, 2, Case);
+    //printf("allocated : %d, loop : %d", size/81, ((width-1)/9)*((height-1)/9));
+    
+printf("avant");
+DoneAll(histo, coord, width, height);
+printf("apres");
 SDL_FreeSurface(image_surface);
-void SDL_FreeSurface(SDL_Surface *surface);
-
-    return 0;
+void SDL_FreeSurface(SDL_Surface *surface); 
+return image_surface;
  }
+
+int main(int argc , char *argv[])
+{
+    char* image = argv[1];
+    SDL_Surface* image_surface;                                                
+    init_sdl();                                                                
+    image_surface = load_image(image);      
+    
+	pretraitement(image_surface);
+	return 0;
+}
