@@ -1,0 +1,2 @@
+`pkg-config --libs sdl SDL_image SDL_gfx ` -lm
+
