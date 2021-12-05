@@ -280,7 +280,7 @@ void get_prediction(){
     double maxi = 0;
     int max_indice = -1;
     for(int j =0; j < 1; j++){
-        for(int i = 0; i < 10; i++){
+        for(int i = 1; i < 10; i++){
             if(maxi < A2[i][j]){
                 maxi = A2[i][j];
                 max_indice = i;
