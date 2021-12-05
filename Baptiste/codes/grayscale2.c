@@ -129,7 +129,8 @@ int isEmpty(SDL_Surface* image_surface, int width, int height)
 		}
 	}
 	}
-	if (cpt > (height*width)-20)
+	printf(" cpt =  %d size = %d ", cpt,height*width);
+	if (cpt == (height*width))
 	{
 		return 1;
 	}
@@ -1190,7 +1191,7 @@ FILE *fp;
 
 if(!(isEmpty(image_surface,width,height)))
 {
-printf("  prediction =  %i  ", predi);
+printf("  predictionprdi =  %i  ", predi);
 return predi;
 }
 else
@@ -1209,5 +1210,5 @@ int main(int argc , char *argv[])
     init_sdl();                                                                
     image_surface = load_image(image);      
     
-	return pretraitement(image_surface,9);
+	return pretraitement(image_surface,1);
 }
