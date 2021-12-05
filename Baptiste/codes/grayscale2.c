@@ -371,7 +371,6 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
 
         	if (Stop == 72)
                 {
-			printf("couille\n");
                         i = *(coord+1) + (heightReal - heightReal/9) -1;
                 }
          
@@ -1163,7 +1162,9 @@ FILE *fp;
     ssize_t read;
     // SDL //
     image_surface = load_image("image.bmp");
-    width = image_surface->w;
+    SDL_SaveBMP(rotozoomSurface(image_surface,0,0.2522522,1),"image.bmp");    
+   image_surface = load_image("image.bmp"); 
+   width = image_surface->w;
     height = image_surface->h;
     histo = 0;
     histo = (int*) malloc( (width * height) * sizeof(int));
@@ -1200,6 +1201,7 @@ FILE *fp;
 
 if(!(isEmpty(image_surface,width,height)))
 {
+SDL_SaveBMP(rotozoomSurface(image_surface,0,3.97,1),"image.bmp");
 SDL_FreeSurface(image_surface);
 void SDL_FreeSurface(SDL_Surface *surface); 
 printf("  predictionprdi =  %i  ", predi);
@@ -1207,6 +1209,7 @@ return predi;
 }
 else
 {
+SDL_SaveBMP(rotozoomSurface(image_surface,0,3.97,1),"image.bmp");
 SDL_FreeSurface(image_surface);
 void SDL_FreeSurface(SDL_Surface *surface); 
 }
