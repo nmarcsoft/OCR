@@ -6,8 +6,24 @@
 #include "pixel_operations.h"
 #include <SDL/SDL_rotozoom.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdlib.h>
+
 
 #define TEMPS       30 
+int X[784][1];
+double W1[10][784];
+double b1[10];
+double W2[10][10];
+double b2[10];
+double Z1[10][1];
+double A1[10][41450];
+double A1_t[41000][10];
+double Z2[10][41450];
+double A2[10][41450];
+double Z2exp[10][1];
+double sum_Z2exp[1];
+int predictions[1];
 
 void init_sdl()
 {
@@ -93,7 +109,31 @@ void copySurface(int * from, SDL_Surface* to, int width, int height)
                 }
             }
         }
-        SDL_SaveBMP(to, "new.bmp");
+        SDL_SaveBMP(to, "image.bmp");
+}
+
+
+int isEmpty(SDL_Surface* image_surface, int width, int height)
+{
+	int cpt = 0;
+	for (int i = 0; i < height; i++){
+	for (int j = 0; j < width; j++)
+	{
+		Uint32 pixel = get_pixel(image_surface,i,j);
+                Uint8 r, g, b;
+                SDL_GetRGB(pixel, image_surface->format,
+                        &r, &g, &b);
+		if (r == 255)
+		{
+			cpt++;
+		}
+	}
+	}
+	if (cpt > (height*width)-20)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 
@@ -344,7 +384,7 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
 	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
         /*toPrint = */y = Rogne(toPrint, widthReal/9, heightReal/9);
         //printMatrix(toPrint, 88, 88);
-        copySurface(toPrint, load_image("new.bmp"), widthReal/9, heightReal/9);
+        copySurface(toPrint, load_image("image.bmp"), widthReal/9, heightReal/9);
                         Stop++;
                         //}
                         if (Stop == toStop)
@@ -467,8 +507,157 @@ int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 //Line
 
 
+
+
+void RelU(){
+    for(int i=0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            if(Z1[i][j] > 0){
+                A1[i][j] = Z1[i][j];
+            }
+            else{
+                A1[i][j] = 0;
+            }
+        }
+    }
+}
+
+void add(int v){
+    if(v == 0){
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 1; j++){
+                Z1[i][j] += b1[i];
+            }
+        }
+    }
+    if(v == 1){
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 1; j++){
+                Z2[i][j] += b2[i];
+            }
+        }
+    }
+
+}
+
+void softmax(){
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            Z2exp[i][j] = exp(Z2[i][j]);
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            sum_Z2exp[j] = 0;
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            sum_Z2exp[j] += Z2exp[i][j];
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            A2[i][j] = exp(Z2[i][j]) / sum_Z2exp[j];
+        }
+    }
+}
+
+
+
+void dot(int R1, int C2, int R2, int v){
+    double hlo;
+    double ow;
+    if(v == 0){
+        double tmp;
+        for(int x = 0; x < R1; x++){
+            for(int j = 0; j < C2; j++){
+                Z1[x][j] = 0;
+                for(int k = 0; k < R2; k++){
+                    hlo = W1[x][k];
+                    ow = X[k][j];
+                    tmp = hlo * ow;
+                    if(isnan(tmp) || isinf(tmp)){
+                        tmp = 0;
+                    }
+                    Z1[x][j] += tmp;
+                }
+            }
+        }
+    }
+    if(v == 1){
+        double tmp;
+        for(int x = 0; x < R1; x++){
+            for(int j = 0; j < C2; j++){
+                Z2[x][j] = 0;
+                for(int k = 0; k < R2; k++){
+                    hlo = W2[x][k];
+                    ow = A1[k][j];
+                    tmp = hlo * ow;
+                    if(isnan(tmp) || isinf(tmp)){
+                        tmp = 0;
+                    }
+                    Z2[x][j] += tmp;
+                }
+            }
+        }
+    }
+}
+
+
+void bias1(int i, char *line){
+    b1[i] = strtod(line, NULL);
+}
+
+void weight1(int i, int j, char* line){
+    W1[i][j] = strtod(line, NULL);
+}
+
+void weight2(int i, int j, char* line){
+    W2[i][j] = strtod(line, NULL);
+}
+
+void bias2(int i, char *line){
+    b2[i] = strtod(line, NULL);
+}
+
+void forward_prop(){
+    dot(10, 1, 784, 0); //Z1 = W1.dot(X)
+    add(0);
+    RelU();
+    dot(10, 1, 10, 1);
+    add(1);
+    softmax();
+}
+void get_prediction(){
+    double maxi = 0;
+    int max_indice = -1;
+    for(int j =0; j < 1; j++){
+        for(int i = 0; i < 10; i++){
+            if(maxi < A2[i][j]){
+                maxi = A2[i][j];
+                max_indice = i;
+            }
+        }
+        maxi = 0;
+        predictions[j] = max_indice;
+    }
+}
+
+void find_image(int *image){
+    for(int i = 0; i < 754; i++){
+        X[i][0] = *(image + i);
+    }
+}
+
+int do_prediction(int *image){
+    find_image(image);
+    forward_prop();
+    get_prediction();
+    return predictions[0];
+}
     
-SDL_Surface* pretraitement(SDL_Surface* image_surface, int toStop)                                                                     
+int pretraitement(SDL_Surface* image_surface, int toStop)                                                                     
 {                                                                              
     
     int width = image_surface->w;                                              
@@ -957,11 +1146,61 @@ SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
     
 printf("avant");
 DoneAll(histo, coord, width, height,toStop);
-printf("apres");
+//Code Martin
+FILE *fp;
+    char *line;
+    size_t len = 0;
+    ssize_t read;
+    // SDL //
+    image_surface = load_image("image.bmp");
+    width = image_surface->w;
+    height = image_surface->h;
+    histo = 0;
+    histo = (int*) malloc( (width * height) * sizeof(int));
+    histo = initializeHisto(histo, image_surface, width, height);
+    // END SDL //
+
+    fp = fopen("save.txt", "r");
+    if(fp == NULL){
+        exit(EXIT_FAILURE);
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 784; j++){
+            read = getline(&line, &len, fp);
+            weight1(i, j, line);
+        }
+    }
+    for(int i = 0; i <10; i++){
+        read = getline(&line, &len, fp);
+        bias1(i, line);
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            read = getline(&line, &len, fp);
+            weight2(i, j, line);
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        read = getline(&line, &len, fp);
+        bias2(i,line);
+    }
+    fclose(fp);
+    int predi = do_prediction(histo);
+
+
+if(!(isEmpty(image_surface,width,height)))
+{
+printf("  prediction =  %i  ", predi);
+return predi;
+}
+else
+{
+printf("  prediction =  %i  ", 0);
+return 0;
+}
 SDL_FreeSurface(image_surface);
 void SDL_FreeSurface(SDL_Surface *surface); 
-return image_surface;
- }
+}
 
 int main(int argc , char *argv[])
 {
@@ -970,6 +1209,5 @@ int main(int argc , char *argv[])
     init_sdl();                                                                
     image_surface = load_image(image);      
     
-	pretraitement(image_surface,1);
-	return 0;
+	return pretraitement(image_surface,9);
 }
