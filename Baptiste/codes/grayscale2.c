@@ -1118,13 +1118,20 @@ height = image_surface->h;
         }
 	
 SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
+
 }
+return 0;
 //save
-                                                  
+}
+ 
+int NicoMartin(SDL_Surface* image_surface, int toStop)
+{ 
+//CODE NICO                                                  
+
     image_surface = load_image("image3.bmp");
     // VARIABLES :
-    width = image_surface->w;
-    height = image_surface->h;
+    int width = image_surface->w;
+    int height = image_surface->h;
     int size = width * height;
     int *histo = 0;
     histo = (int*) malloc(size * sizeof(int));
@@ -1147,7 +1154,9 @@ SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
     
 printf("avant");
 DoneAll(histo, coord, width, height,toStop);
+
 //Code Martin
+
 FILE *fp;
     char *line;
     size_t len = 0;
@@ -1191,24 +1200,25 @@ FILE *fp;
 
 if(!(isEmpty(image_surface,width,height)))
 {
+SDL_FreeSurface(image_surface);
+void SDL_FreeSurface(SDL_Surface *surface); 
 printf("  predictionprdi =  %i  ", predi);
 return predi;
 }
 else
 {
-printf("  prediction =  %i  ", 0);
-return 0;
-}
 SDL_FreeSurface(image_surface);
 void SDL_FreeSurface(SDL_Surface *surface); 
 }
-
+printf("  prediction =  %i  ", 0);
+return 0;
+}
 int main(int argc , char *argv[])
 {
     char* image = argv[1];
     SDL_Surface* image_surface;                                                
     init_sdl();                                                                
     image_surface = load_image(image);      
-    
-	return pretraitement(image_surface,1);
+	pretraitement(image_surface,1);
+	return NicoMartin(image_surface,1);
 }
