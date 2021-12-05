@@ -60,7 +60,7 @@ void on_next_button_clicked()
             gtk_container_remove(GTK_CONTAINER(paneau), image);
 
             image = gtk_image_new_from_file("cache/base");
-            filename = "/home/antoll/Desktop/EPITA/PROJET/OCR/Interface/cache/base";
+            filename = "cache/base";
             GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file_at_scale(filename,1150,1150,TRUE, NULL);
             gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf2);
 
@@ -80,9 +80,7 @@ void on_next_button_clicked()
             gtk_widget_show(i->image_sol);
             gtk_widget_hide(i->image);
             */
-            sleep(2);
             countnext++;
-            sleep(2);
             break;
         case 1:
             g_print("sheeesh2");
