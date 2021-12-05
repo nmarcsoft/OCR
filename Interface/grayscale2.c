@@ -371,7 +371,6 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
 
         	if (Stop == 72)
                 {
-			printf("couille\n");
                         i = *(coord+1) + (heightReal - heightReal/9) -1;
                 }
          
@@ -394,7 +393,6 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
                         }
                                 /*if (Stop == 72)
                                 {
-					printf("couille\n");
                                         i = *(coord+1) + (heightReal - heightReal/9) -1;
                                 }*/
                 }
