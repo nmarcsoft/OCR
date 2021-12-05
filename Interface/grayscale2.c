@@ -203,7 +203,8 @@ int * DetectStart(int * histo, int width, int height, int * coord)
 
 
 
-int * initializeHisto(int * histo, SDL_Surface* image_surface, int width, int height)
+int * initializeHisto(int * histo, SDL_Surface* image_surface,
+		int width, int height)
 {
         Uint32 pixel;
         Uint8 r, b, g;
@@ -257,7 +258,6 @@ int Width(int * histo, int * coord, int width)
             break;
         }
         }
-        //printf("debug width x = %d ; y = %d, value = %d, width = %d", x, y, *(histo + (x * width + y)), width);
         return (x - (*(coord)));
 }
 
@@ -278,7 +278,6 @@ int Height(int * histo, int * coord, int height)
                 }
                 if (toReturn >= 2)
                 {
-                        //printf("\nx = %d, y = %d, value = %d\n", x, y, (*(histo + (((y) * height + x)))));
                         y+=5;
                 }
                 else
@@ -291,7 +290,8 @@ int Height(int * histo, int * coord, int height)
 }
 
 
-int * cut(int * histo, int i, int j, int widthR, int heightR, int width, int * a)
+int * cut(int * histo, int i, int j, int widthR, int heightR, int width,
+		int * a)
 {
       printf("x = %d , y = %d \n",j,i);
         for (int k = 0; k < heightR/9; k++)
@@ -366,15 +366,15 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
         printf("Height = %d, Width = %d", heightReal, widthReal);
         int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int));
 	int Stop = 0;
-	for (int i = *(coord+1); i < heightReal + *(coord+1); i+=(heightReal/9))
+for (int i = *(coord+1); i < heightReal + *(coord+1); i+=(heightReal/9))
         {
 
         	if (Stop == 72)
                 {
                         i = *(coord+1) + (heightReal - heightReal/9) -1;
                 }
-         
-                for (int j = *coord; j < widthReal + (*coord)-20; j+=(widthReal/9))
+        
+           for (int j = *coord; j < widthReal + (*coord)-20; j+=(widthReal/9))
                 {
                         //printf("x = %d, y = %d\n", i, j);
                         //if (*(histo + (i * widthReal + j)) == 0)
@@ -384,7 +384,7 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
 	toPrint = cut(histo, i, j, widthReal, heightReal, width, toPrint);
         /*toPrint = */y = Rogne(toPrint, widthReal/9, heightReal/9);
         //printMatrix(toPrint, 88, 88);
-        copySurface(toPrint, load_image("image.bmp"), widthReal/9, heightReal/9);
+      copySurface(toPrint, load_image("image.bmp"), widthReal/9, heightReal/9);
                         Stop++;
                         //}
                         if (Stop == toStop)
@@ -393,7 +393,6 @@ void DoneAll(int * histo, int * coord, int width, int height, int toStop)
                         }
                                 /*if (Stop == 72)
                                 {
-                                        i = *(coord+1) + (heightReal - heightReal/9) -1;
                                 }*/
                 }
                 if (Stop == toStop)
@@ -655,28 +654,25 @@ int do_prediction(int *image){
     get_prediction();
     return predictions[0];
 }
-    
-int pretraitement(SDL_Surface* image_surface, int toStop)                                                                     
-{                                                                              
-    
-    int width = image_surface->w;                                              
-    int height = image_surface->h;                                             
-    float zoom = 0;                                                            
-    float w = image_surface->w;                                                
-    float h = image_surface->h;                                                
+int pretraitement(SDL_Surface* image_surface, int toStop)
+{
+
+    int width = image_surface->w;
+    int height = image_surface->h;
+    float zoom = 0;
+    float w = image_surface->w;
+    float h = image_surface->h;
     float mid = 0;
-    int min_gray =0;         
-                                                       
-                                                                           
-    if(height > width)                                                         
-    {                                                                          
-	zoom = 1000/h;                                                         
-    }                                                                          
-    else                                                                       
-    {                                                                          
-	zoom = 1000/w;                                                        
-    }   
-//1000x1000 window                                            
+    int min_gray =0;
+    if(height > width)
+    {
+	zoom = 1000/h;
+    }
+    else
+    {
+	zoom = 1000/w;
+    }
+//1000x1000 window
 SDL_SaveBMP(rotozoomSurface(image_surface,0,zoom,1),"image3.bmp");
 image_surface = load_image("image3.bmp");
 
@@ -685,8 +681,6 @@ image_surface = load_image("image3.bmp");
      w = image_surface->w;
      h = image_surface->h;
 
-                                                  
- 
     for(int x = 0; x < width; x++)
     {
        for(int y = 0; y < height;y++)
@@ -773,7 +767,6 @@ Uint32 pixel8 = get_pixel(image_surface,x+1,y+1);
 		}
 }
 //Median Filter
-                                                  
 //Contrast
 
     float k = 0.5;
@@ -885,10 +878,9 @@ for (int tempw = 0; tempw < width; tempw+=25)
         Uint8 rp, gp, bp;
         SDL_GetRGB(pixelyp, image_surface -> format, &rp, &gp, &bp);
 	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
-	image_surface = load_image("image3.bmp");                         
-                                                                               
-	width = image_surface->w;                                              
-	height = image_surface->h;                       
+	image_surface = load_image("image3.bmp");
+	width = image_surface->w;
+	height = image_surface->h;
 	for(int cpt =0;cpt<3;cpt++)
 	{
 	for(int x = 1; x < width-1; x++)
@@ -955,11 +947,11 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	                	}
 			}
 			Uint32 pixeltmp = SDL_MapRGB
-	                (image_surface->format, tableau[2], tableau[2], tableau[2]);
+	                (image_surface->format, tableau[2], tableau[2], 
+			 tableau[2]);
 	                put_pixel(image_surface, x, y, pixeltmp);
 			}
 }}}
-                                                  
 //Noise suppression
 
 	SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
@@ -970,7 +962,7 @@ for (int tempw = 0; tempw < width; tempw+=25)
 		Uint32 pixel = get_pixel(image_surface, x, y);
 		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
 		x+=1;
-		if(r == 255){white = 1;}	
+		if(r == 255){white = 1;}
 	}
 	// Waiting for one white pixel
 	
@@ -988,13 +980,13 @@ for (int tempw = 0; tempw < width; tempw+=25)
 	int debug = 0;
 	while(!(lignedroite(image_surface,x,y,0)))
          {
-		debug = 1;	
+		debug = 1;
 		angleline += 1;
 		y = height/2;
 		SDL_SaveBMP(rotozoomSurface(image_surface,1,1,1),"image3.bmp");
 		image_surface = load_image("image3.bmp");
-		width = image_surface->w;                                      
-		height = image_surface->h;                       
+		width = image_surface->w;
+		height = image_surface->h;
 		Uint32 pixel = get_pixel(image_surface, x, y);
                 SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
 		if(r != 0)
@@ -1007,7 +999,8 @@ for (int tempw = 0; tempw < width; tempw+=25)
 			while (white==0)
 		        {
                  		Uint32 pixel = get_pixel(image_surface, x, y);
-                 		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
+                 		SDL_GetRGB(pixel, image_surface -> format, &r,
+						&g, &b);
                  		x+=1;
                  		if(r == 255){white = 1;}
       			}
@@ -1015,19 +1008,21 @@ for (int tempw = 0; tempw < width; tempw+=25)
 			{
 				x+=1;
 				Uint32 pixel = get_pixel(image_surface, x, y);
-				SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
+				SDL_GetRGB(pixel, image_surface -> format, &r,
+						&g, &b);
 				if(r == 0){black = 1;}	
 			}
 			while(r != 0)
 			{	
 				x+=1;
 				Uint32 pixel = get_pixel(image_surface, x, y);
-   	        		SDL_GetRGB(pixel, image_surface -> format, &r, &g, &b);
+   	        		SDL_GetRGB(pixel, image_surface -> format, &r, 
+						&g, &b);
 			}//adjust if the rotation loose the line
 		}
 
-		
-	}	
+	
+	}
 	angleline = angleline*0.0174533;
 	linea = tan(angleline)*width;
 	for(int k = 0; k < width; k++)
@@ -1124,7 +1119,7 @@ return 0;
  
 int NicoMartin(SDL_Surface* image_surface, int toStop)
 { 
-//CODE NICO                                                  
+//CODE NICO
 
     image_surface = load_image("image3.bmp");
     // VARIABLES :
