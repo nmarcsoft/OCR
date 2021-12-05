@@ -317,16 +317,15 @@ void perfectStart(int * coord, int * histo, int width)
         }
 }
 
-void DoneAll(int * histo, int * coord, int width, int height)
+void DoneAll(int * histo, int * coord, int width, int height, int toStop)
 {
         int y = 0;
         int widthReal = Width(histo, coord, width);
         int heightReal = Height(histo, coord, height);
         printf("Height = %d, Width = %d", heightReal, widthReal);
         int *toPrint = (int*) malloc((widthReal/9*heightReal/9) * sizeof(int));
-        int Stop = 0;
-        int toStop = 81;
-        for (int i = *(coord+1); i < heightReal + *(coord+1); i+=(heightReal/9))
+	int Stop = 0;
+	for (int i = *(coord+1); i < heightReal + *(coord+1); i+=(heightReal/9))
         {
 
         	if (Stop == 72)
@@ -469,7 +468,7 @@ int line (SDL_Surface* image_surface,int i,int j,int toreturn)
 
 
     
-SDL_Surface* pretraitement(SDL_Surface* image_surface)                                                                     
+SDL_Surface* pretraitement(SDL_Surface* image_surface, int toStop)                                                                     
 {                                                                              
     
     int width = image_surface->w;                                              
@@ -957,7 +956,7 @@ SDL_SaveBMP(rotozoomSurface(image_surface,0,1,1),"image3.bmp");
     //printf("allocated : %d, loop : %d", size/81, ((width-1)/9)*((height-1)/9));
     
 printf("avant");
-DoneAll(histo, coord, width, height);
+DoneAll(histo, coord, width, height,toStop);
 printf("apres");
 SDL_FreeSurface(image_surface);
 void SDL_FreeSurface(SDL_Surface *surface); 
@@ -971,6 +970,6 @@ int main(int argc , char *argv[])
     init_sdl();                                                                
     image_surface = load_image(image);      
     
-	pretraitement(image_surface);
+	pretraitement(image_surface,1);
 	return 0;
 }
