@@ -1,0 +1,1 @@
+solving.o: solving.c

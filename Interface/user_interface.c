@@ -118,7 +118,7 @@ void on_next_button_clicked()
                         
             i = 0;
             j = 0;
-            fptr = fopen("sortieneuron","w+");
+            fptr = fopen("sortieneuron.txt","w+");
             /*
             for(int i = 0; i < 9; i++)
             {
