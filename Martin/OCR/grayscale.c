@@ -2,11 +2,22 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
-#include "mnist_file.h"
-#include "nn.h"
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "pixel_operations.h"
+int X[784][1];
+double W1[10][784];
+double b1[10];
+double W2[10][10];
+double b2[10];
+double Z1[10][1];
+double A1[10][41450];
+double A1_t[41000][10];
+double Z2[10][41450];
+double A2[10][41450];
+double Z2exp[10][1];
+double sum_Z2exp[1];
+int predictions[1];
 
 void init_sdl()
 {
@@ -117,35 +128,6 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
-
-
-void weights(int i, int j, char *line, neural_network_t *network){
-    network->weights[i][j] = strtod(line, NULL);
-}
-
-void bias(int i, char *line, neural_network_t *network){
-    network->bias[i] = strtod(line, NULL);
-}
-
-float calculate_accuracy(mnist_dataset_t * dataset, neural_network_t * network)
-{
-    float activations[MNIST_LABELS], max_activation;
-    int i, j, correct, predict;
-    for (i = 0, correct = 0; i < dataset->size; i++) {
-	hypothesis(&dataset->images[i], network, activations);
-        for (j = 0, predict = 0, max_activation = activations[0]; j < MNIST_LABELS; j++) {
-            if (max_activation < activations[j]) {
-                max_activation = activations[j];
-                predict = j;
-            }
-        }
-        if (predict == dataset->labels[i]) {
-            correct++;
-        }
-    }
-    return ((float) correct) / ((float) dataset->size);
-}
-
 void printMatrix(int* a, int height, int width)
 {
 /*
@@ -162,7 +144,7 @@ void printMatrix(int* a, int height, int width)
 	  printf("\n");
 	}
 	}
-	*/
+*/
    int size = 784;
    for (int i = 0; i < size; i++)
    {
@@ -176,13 +158,153 @@ void printMatrix(int* a, int height, int width)
    printf("\n\n");
 }
 
+void RelU(){
+    for(int i=0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            if(Z1[i][j] > 0){
+                A1[i][j] = Z1[i][j];
+            }
+            else{
+                A1[i][j] = 0;
+            }
+        }
+    }
+}
 
+void add(int v){
+    if(v == 0){
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 1; j++){
+                Z1[i][j] += b1[i];
+            }
+        }
+    }
+    if(v == 1){
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 1; j++){
+                Z2[i][j] += b2[i];
+            }
+        }
+    }
+
+}
+
+void softmax(){
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            Z2exp[i][j] = exp(Z2[i][j]);
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            sum_Z2exp[j] = 0;
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            sum_Z2exp[j] += Z2exp[i][j];
+        }
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 1; j++){
+            A2[i][j] = exp(Z2[i][j]) / sum_Z2exp[j];
+        }
+    }
+}
+
+void dot(int R1, int C2, int R2, int v){
+    double hlo;
+    double ow;
+    if(v == 0){
+        double tmp;
+        for(int x = 0; x < R1; x++){
+            for(int j = 0; j < C2; j++){
+                Z1[x][j] = 0;
+                for(int k = 0; k < R2; k++){
+                    hlo = W1[x][k];
+                    ow = X[k][j];
+                    tmp = hlo * ow;
+                    if(isnan(tmp) || isinf(tmp)){
+                        tmp = 0;
+                    }
+                    Z1[x][j] += tmp;
+                }
+            }
+        }
+    }
+    if(v == 1){
+        double tmp;
+        for(int x = 0; x < R1; x++){
+            for(int j = 0; j < C2; j++){
+                Z2[x][j] = 0;
+                for(int k = 0; k < R2; k++){
+                    hlo = W2[x][k];
+                    ow = A1[k][j];
+                    tmp = hlo * ow;
+                    if(isnan(tmp) || isinf(tmp)){
+                        tmp = 0;
+                    }
+                    Z2[x][j] += tmp;
+                }
+            }
+        }
+    }
+}
+
+
+void bias1(int i, char *line){
+    b1[i] = strtod(line, NULL);
+}
+
+void weight1(int i, int j, char* line){
+    W1[i][j] = strtod(line, NULL);
+}
+
+void weight2(int i, int j, char* line){
+    W2[i][j] = strtod(line, NULL);
+}
+
+void bias2(int i, char *line){
+    b2[i] = strtod(line, NULL);
+}
+
+void forward_prop(){
+    dot(10, 1, 784, 0); //Z1 = W1.dot(X)
+    add(0);
+    RelU();
+    dot(10, 1, 10, 1);
+    add(1);
+    softmax();
+}
+void get_prediction(){
+    double maxi = 0;
+    int max_indice = -1;
+    for(int j =0; j < 1; j++){
+        for(int i = 0; i < 10; i++){
+            if(maxi < A2[i][j]){
+                maxi = A2[i][j];
+                max_indice = i;
+            }
+        }
+        maxi = 0;
+        predictions[j] = max_indice;
+    }    
+}
+
+void find_image(int *image){
+    for(int i = 0; i < 754; i++){
+        X[i][0] = *(image + i);
+    }
+}
+
+int do_prediction(int *image){
+    find_image(image);
+    forward_prop();
+    get_prediction();
+    return predictions[0]; 
+}
 
 int main(){
-    float accuracy;
-    const char *test_images_file = "data/t10k-images-idx3-ubyte";
-    const char *test_labels_file = "data/t10k-labels-idx1-ubyte";
-    neural_network_t network;
     FILE *fp;
     char *line;
     size_t len = 0;
@@ -196,40 +318,36 @@ int main(){
     int * histo = 0;
     histo = (int*) malloc( (width * height) * sizeof(int));
     histo = initializeHisto(histo, image_surface, width, height);
-    // SDL // 
-    fp = fopen("program.txt", "r");
+    // END SDL // 
+    
+    fp = fopen("save.txt", "r");
     if(fp == NULL){
         exit(EXIT_FAILURE);
-    }
-    for(int i = 0; i <10; i++){
-        read = getline(&line, &len, fp);
-        bias(i, line, &network);
     }
     for(int i = 0; i < 10; i++){
         for(int j = 0; j < 784; j++){
             read = getline(&line, &len, fp);
-            weights(i, j, line, &network);
+            weight1(i, j, line);
         }
     }
-    fclose(fp);
-    mnist_dataset_t *test_dataset;
-    test_dataset = mnist_get_dataset(test_images_file, test_labels_file);
-    accuracy = calculate_accuracy(test_dataset, &network);
-    printf("Accuracy: %.3f\n", accuracy);
-    //PREDICT
-    int predict = 0;
-    float activations[MNIST_LABELS], max_activations;
-    //hypothesis(&test_dataset->images[0], &network, activations);
-    hypothesis_real(histo, &network, activations);
-    max_activations = activations[0];
-        for(int z = 0; z < 10; z++){
-		printf("%f ", activations[z]);
-            if(max_activations < activations[z]){
-                max_activations = activations[z];
-                predict = z;
-            }
+    for(int i = 0; i <10; i++){
+        read = getline(&line, &len, fp);
+        bias1(i, line);
+    }
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            read = getline(&line, &len, fp);
+            weight2(i, j, line);
         }
-    printMatrix(histo, 28, 28);
-    printf("%d", predict);   
+    }
+    for(int i = 0; i < 10; i++){
+        read = getline(&line, &len, fp);
+        bias2(i,line);
+    }
+    fclose(fp);
+    int predi = do_prediction(histo);
+    printf("%i", predi);
     return 0;
+
 }
+

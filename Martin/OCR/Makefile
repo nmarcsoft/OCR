@@ -10,7 +10,7 @@ LDLIBS= `pkg-config --libs sdl SDL_image SDL_gfx ` -lm
 all: display grayscale
 
 display: display.o
-grayscale: pixel_operations.o grayscale.o nn.c data.c 
+grayscale: pixel_operations.o grayscale.o  
 grayscale2: pixel_operations.o grayscale2.o
 grayscale.o: pixel_operations.h
 

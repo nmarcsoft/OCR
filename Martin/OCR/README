@@ -1,1 +1,0 @@
-gcc train.c data.c nn.c -lm -o train
