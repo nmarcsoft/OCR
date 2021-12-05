@@ -13,7 +13,7 @@ int Width(int * histo, int * coord, int width);
 int Height(int * histo, int * coord, int width);
  int * cut(int * histo, int i, int j, int widthR, int heightR, int width,     int * a);
 int Rogne(int * toPrint, int width, int height);
-void DoneAll(int * histo, int * coord, int width, int height);
+void DoneAll(int * histo, int * coord, int width, int height, int toStop);
 
 
 
