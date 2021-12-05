@@ -6,7 +6,11 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
+#include "grayscale2.h"
+#include "pixel_operations.h"
+#include "segmentation.h"
+#include <math.h>
+#include <SDL/SDL_rotozoom.h>
 
 typedef struct UserInterface
 {
@@ -16,8 +20,6 @@ typedef struct UserInterface
   GtkWidget* resolve_button;     //Resolving the sudoku
   GtkBuilder* builder;           //just to save the builder
   GtkWidget* file_dialog;        //widget to choose a file to open
-  //GtkWidget* image;  //the image gtk will display, it is the same that we will apply ocr on
-  //GtkWidget* image_sol;
   GtkWidget* next_button;
 } UserInterface;
 
@@ -27,21 +29,21 @@ GtkWidget* image_sol;
 
 GtkWidget* paneau;
 
+SDL_Surface *img;
+SDL_Surface *img2;
+int img2i;
+
 char* filename;
 int countnext = 0;
+int done = 0;
+int intertout = 1;
+int res;
+int i = 0;
+int j = 0;
+FILE *fptr;
 
-/*
-GtkWindow* window;             // Main window
-GtkWidget* open_button;        // Open button
-GtkWidget* close_button;       // Close button
-GtkWidget* quit_button;        // Quit button
-GtkWidget* resolve_button;     //Resolving the sudoku
-GtkBuilder* builder;           //just to save the builder
-GtkWidget* file_dialog;        //widget to choose a file to open
-GtkWidget* image;              //the image gtk will display, it is the same that we will apply ocr on
-
-
-GtkWidget *page0;*/
+int e[9][9] = {0};
+char txte[81];
 
 
 void on_next_button_clicked()
@@ -50,55 +52,110 @@ void on_next_button_clicked()
     switch(countnext) 
     {
         case 0:
-            //image_sol = GTK_WIDGET(gtk_builder_get_object(builder,"image_print"));
-            g_print("sheeesh\n");
-            SDL_Surface *img = IMG_Load(filename);
-            g_print("oui\n");
+            //CAS GRAYSCALE
+            //
+            //
+                if(!done)
+            {
+            img = IMG_Load(filename);
+  
             SDL_SaveBMP(img, "cache/s");
-            g_print("non\n");
+
             
             gtk_container_remove(GTK_CONTAINER(paneau), image);
 
-            image = gtk_image_new_from_file("cache/base");
-            filename = "cache/base";
-            GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file_at_scale(filename,1150,1150,TRUE, NULL);
+            img2i = pretraitement(img,1);
+
+            done = 1;
+     
+
+            } 
+
+            
+
+            countnext++;
+            break;
+        case 1:
+            //CAS VIDE
+            //
+
+            image = gtk_image_new_from_file("image3.bmp");
+            filename = "image3.bmp";
+
+            GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file_at_scale
+                (filename,801,801,TRUE, NULL);
             gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf2);
 
             gtk_container_add(GTK_CONTAINER(paneau),image);
             
 
             gtk_widget_show(image);
-            //gtk_widget_hide(image);
-            g_print("amigo\n");
-            
-            //traitement image
-            /*
-            gchar *filename = gtk_file_chooser_get_filename("cache/base");
-            GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_scale(filename,801,801,TRUE, NULL);
-            
-            gtk_image_set_from_pixbuf(GTK_IMAGE(i->image_sol),pixbuf);
-            gtk_widget_show(i->image_sol);
-            gtk_widget_hide(i->image);
-            */
-            countnext++;
-            break;
-        case 1:
-            g_print("sheeesh2");
-            //rotation  image
+
+
             countnext++;
             break;
         case 2:
-            //segmentation
-            g_print("a");
+
+            //itertout
+            while(intertout < 82)
+            {
+               
+
+                res = NicoMartin(img,intertout);
+                g_print("%d\n",intertout);
+                //écrire dans un fichier .txt
+                txte[intertout-1] = res;
+                /*
+                j++;
+                if(j > 8)
+                {
+                    i++;
+                    j = 0;
+                }*/
+                intertout++;                
+            }
+
+                        
+            i = 0;
+            j = 0;
+            fptr = fopen("sortieneuron.txt","w+");
+            /*
+            for(int i = 0; i < 9; i++)
+            {
+                g_print("AAAAAA");
+                for(int j = 0; j < 9; j++)
+                {
+                    g_print("o");
+                    fprintf(fptr,"%d", e[i][j]);
+                }
+                fputs("\n",fptr);
+            }*/
+            while(i<81)
+            {
+                fprintf(fptr,"%d",txte[i]);
+                i++;
+            }
+            
             countnext++;
             break;
+            
         case 3:
-            //solve sudoku
+            //CAS VIDE
+            //
+            //
+
+            image = gtk_image_new_from_file("logo.png");
+            filename = "logo.png";
+           
+            gtk_container_remove(GTK_CONTAINER(paneau), image);
+
+            gtk_widget_show(image);
+            
             countnext++;
             break;
         default:
             //save the sudoku
-            g_print("a");
+
             countnext++;
             break;
     }
@@ -121,7 +178,8 @@ void on_open(GtkWidget *button, gpointer ui)
             /*
             int width = gtk_widget_get_allocated_width(taillefenetre); 
             int height = gtk_widget_get_allocated_height(taillefenetre);*/
-            GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_scale(filename,801,801,TRUE, NULL);
+            GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_scale
+                (filename,801,801,TRUE, NULL);
             gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf);
 
             gtk_widget_show(image);
@@ -180,27 +238,37 @@ int main()
     builder = gtk_builder_new_from_file("user_interface.glade");    
 
     // Gets the widgets.
-    GtkWindow* window = GTK_WINDOW(gtk_builder_get_object(builder, "org.gtk.OCR"));
+    GtkWindow* window = GTK_WINDOW(gtk_builder_get_object
+            (builder, "org.gtk.OCR"));
 
     GdkRGBA color;
     color.red = 000000;
     color.green = 000000;
     color.blue = 000000;
-    gtk_widget_override_background_color(GTK_WIDGET(window),GTK_STATE_NORMAL, &color);
+    gtk_widget_override_background_color(GTK_WIDGET(window),
+            GTK_STATE_NORMAL, &color);
 
-    GtkButton* open_button = GTK_BUTTON(gtk_builder_get_object(builder, "open_button"));
-    GtkWidget* resolve_button = GTK_WIDGET(gtk_builder_get_object(builder, "resolve_button"));
-    GtkWidget* quit_button = GTK_WIDGET(gtk_builder_get_object(builder, "quit_button"));
-    GtkWidget* next_button = GTK_WIDGET(gtk_builder_get_object(builder, "next_button"));
+    GtkButton* open_button = GTK_BUTTON
+        (gtk_builder_get_object(builder, "open_button"));
+    GtkWidget* resolve_button = GTK_WIDGET
+        (gtk_builder_get_object(builder, "resolve_button"));
+    GtkWidget* quit_button = GTK_WIDGET
+        (gtk_builder_get_object(builder, "quit_button"));
+    GtkWidget* next_button = GTK_WIDGET
+        (gtk_builder_get_object(builder, "next_button"));
     paneau = GTK_WIDGET(gtk_builder_get_object(builder, "paneau"));
+    
 
     mkdir("cache",0777); 
 
     GtkFileFilter* filter = gtk_file_filter_new();
-    GtkWidget* file_dialog = gtk_file_chooser_dialog_new("Open image",window,GTK_FILE_CHOOSER_ACTION_OPEN,"Open",GTK_RESPONSE_ACCEPT,"Cancel",GTK_RESPONSE_CANCEL,NULL);
+    GtkWidget* file_dialog = gtk_file_chooser_dialog_new
+        ("Open image",window,GTK_FILE_CHOOSER_ACTION_OPEN,"Open",
+         GTK_RESPONSE_ACCEPT,"Cancel",GTK_RESPONSE_CANCEL,NULL);
     
 /*
-    GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file_at_scale("image_solve.png",801,801,TRUE, NULL);
+    GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file_at_scale
+    ("image_solve.png",801,801,TRUE, NULL);
     gtk_image_set_from_pixbuf(GTK_IMAGE(image_solve.png),pixbuf2);
 */
 
@@ -223,7 +291,8 @@ int main()
     g_signal_connect(open_button, "clicked", G_CALLBACK(on_open), &ui);
     g_signal_connect(quit_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(resolve_button, "clicked", G_CALLBACK(on_resolve), &ui);
-    g_signal_connect(next_button,"clicked",G_CALLBACK(on_next_button_clicked),NULL);
+    g_signal_connect(next_button,"clicked",
+            G_CALLBACK(on_next_button_clicked),NULL);
     //
     gtk_builder_connect_signals(builder,NULL);
 
